@@ -955,28 +955,288 @@
             font-weight: 600;
         }
 
-        /* Responsive */
+        /* Mobile Responsive Styles */
         @media (max-width: 768px) {
             .navbar {
                 padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .navbar-left {
+                position: static;
+                text-align: center;
+            }
+            
+            .navbar-left h1 {
+                font-size: 1.2em;
+            }
+            
+            .navbar-right {
+                position: static;
+                justify-content: center;
             }
             
             .hero h1 {
-                font-size: 2em;
+                font-size: 1.8em;
+                line-height: 1.2;
             }
             
             .hero p {
-                font-size: 1.1em;
+                font-size: 1em;
+                line-height: 1.4;
             }
             
             .year-buttons {
                 gap: 5px;
+                flex-wrap: wrap;
+                justify-content: center;
             }
             
             .year-button {
-                padding: 6px 12px;
+                padding: 8px 12px;
                 font-size: 0.8em;
+                min-width: 60px;
+                margin: 2px;
+            }
+            
+            .timeline-selector {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .timeline-selector h3 {
+                font-size: 1.2em;
+                margin-bottom: 15px;
+            }
+            
+            .current-year-info {
+                font-size: 0.9em;
+                padding: 10px;
+            }
+            
+            .section {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .section h2 {
+                font-size: 1.5em;
+                margin-bottom: 15px;
+            }
+            
+            .section h3 {
+                font-size: 1.3em;
+                margin-bottom: 12px;
+            }
+            
+            .section p {
+                font-size: 0.95em;
+                line-height: 1.4;
+                margin-bottom: 12px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .stat-card {
+                padding: 15px;
+            }
+            
+            .stat-number {
+                font-size: 2em;
+            }
+            
+            .stat-label {
+                font-size: 0.9em;
+            }
+            
+            .detection-table {
+                overflow-x: auto;
+                font-size: 0.85em;
+            }
+            
+            .detection-table th,
+            .detection-table td {
+                padding: 8px 6px;
+                white-space: nowrap;
+            }
+            
+            .chart-container {
+                height: 300px;
+                margin: 15px 0;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                gap: 8px;
+                justify-content: center;
+            }
+            
+            .nav-links a {
+                padding: 8px 12px;
+                font-size: 0.9em;
+                margin: 2px;
+            }
+            
+            .alert-panel {
+                width: 95%;
+                max-width: 400px;
+                right: 10px;
+            }
+            
+            .alert-header h3 {
+                font-size: 1.1em;
+            }
+            
+            .alert-tabs {
+                font-size: 0.9em;
+            }
+            
+            .alert-item {
+                padding: 12px;
+                font-size: 0.9em;
+            }
+            
+            .alert-item h4 {
+                font-size: 1em;
+            }
+            
+            .alert-item p {
+                font-size: 0.85em;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .navbar {
+                padding: 10px 15px;
+            }
+            
+            .navbar-left h1 {
+                font-size: 1em;
+            }
+            
+            .hero h1 {
+                font-size: 1.5em;
+            }
+            
+            .hero p {
+                font-size: 0.9em;
+            }
+            
+            .year-button {
+                padding: 6px 10px;
+                font-size: 0.75em;
                 min-width: 50px;
+            }
+            
+            .timeline-selector {
+                padding: 15px;
+                margin: 5px;
+            }
+            
+            .timeline-selector h3 {
+                font-size: 1.1em;
+            }
+            
+            .section {
+                padding: 15px;
+                margin: 5px;
+            }
+            
+            .section h2 {
+                font-size: 1.3em;
+            }
+            
+            .section h3 {
+                font-size: 1.2em;
+            }
+            
+            .section p {
+                font-size: 0.9em;
+            }
+            
+            .stat-card {
+                padding: 12px;
+            }
+            
+            .stat-number {
+                font-size: 1.8em;
+            }
+            
+            .stat-label {
+                font-size: 0.8em;
+            }
+            
+            .chart-container {
+                height: 250px;
+            }
+            
+            .nav-links a {
+                padding: 6px 10px;
+                font-size: 0.8em;
+            }
+            
+            .detection-table {
+                font-size: 0.8em;
+            }
+            
+            .detection-table th,
+            .detection-table td {
+                padding: 6px 4px;
+            }
+            
+            .alert-panel {
+                width: 98%;
+                right: 5px;
+            }
+        }
+        
+        /* Landscape mobile optimization */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .navbar {
+                padding: 10px 20px;
+                flex-direction: row;
+                justify-content: space-between;
+            }
+            
+            .navbar-left {
+                position: static;
+            }
+            
+            .navbar-right {
+                position: static;
+            }
+            
+            .hero h1 {
+                font-size: 1.6em;
+            }
+            
+            .hero p {
+                font-size: 0.95em;
+            }
+            
+            .year-buttons {
+                gap: 3px;
+            }
+            
+            .year-button {
+                padding: 6px 10px;
+                font-size: 0.75em;
+            }
+            
+            .timeline-selector {
+                padding: 15px;
+            }
+            
+            .section {
+                padding: 15px;
+            }
+            
+            .chart-container {
+                height: 250px;
             }
         }
     </style>
