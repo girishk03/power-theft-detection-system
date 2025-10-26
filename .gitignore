@@ -134,17 +134,18 @@ dmypy.json
 *.joblib
 logs/
 results/plots/
-data/raw/*.csv
-data/processed/*.csv
 models/*.pkl
 models/*.h5
 
-# Keep some important files but ignore large datasets
-!data/raw/dataset.csv
+# Large dataset files (exceed GitHub's 100MB limit)
+data/raw/dataset.csv
+data/processed/only_2025_data.csv
+data/processed/sgcc_theft_data.csv
+power-theft-detection-complete.zip
+
+# Keep smaller important files
 !data/processed/deployment_data.csv
 !data/processed/kaggle_theft_data.csv
-!data/processed/only_2025_data.csv
-!data/processed/sgcc_theft_data.csv
 
 # IDE
 .vscode/
