@@ -782,4 +782,8 @@ if __name__ == '__main__':
     print("✓ Same interface + Timeline selection!")
     print("\n" + "="*70)
     
-    app.run(host='0.0.0.0', port=8105, debug=True, use_reloader=True)
+    # Get port from environment variable (for deployment) or use default
+    port = int(os.environ.get('PORT', 8105))
+    debug_mode = os.environ.get('FLASK_ENV') != 'production'
+    
+    app.run(host='0.0.0.0', port=port, debug=debug_mode, use_reloader=False)
