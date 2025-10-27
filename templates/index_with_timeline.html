@@ -1,0 +1,2971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power Theft Detection System - AI-Based IDS</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px 50px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .navbar-left {
+            position: absolute;
+            left: 50px;
+        }
+
+        .navbar-right {
+            position: absolute;
+            right: 50px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .navbar h1 {
+            color: #667eea;
+            font-size: 2em;
+            margin: 0;
+            font-weight: 700;
+            font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            animation: thunderStrike 3s ease-in-out infinite;
+        }
+
+        .navbar h1 .lightning-icon {
+            display: inline-block;
+            animation: thunderStrike 3s ease-in-out infinite;
+            font-size: 1.3em;
+            margin-right: 8px;
+        }
+
+        @keyframes thunderStrike {
+            0%, 84%, 100% {
+                transform: scale(1);
+                color: #667eea;
+            }
+            85% {
+                transform: scale(1.05);
+                color: #ffffff;
+                text-shadow: 
+                    0 0 20px rgba(255, 255, 255, 1),
+                    0 0 40px rgba(255, 255, 0, 1),
+                    0 0 60px rgba(255, 193, 7, 0.8),
+                    0 0 80px rgba(102, 126, 234, 0.6);
+            }
+            86% {
+                transform: scale(1.02);
+                color: #667eea;
+            }
+            87% {
+                transform: scale(1.08);
+                color: #ffffff;
+                text-shadow: 
+                    0 0 30px rgba(255, 255, 255, 1),
+                    0 0 50px rgba(255, 255, 0, 1),
+                    0 0 70px rgba(255, 193, 7, 1),
+                    0 0 90px rgba(102, 126, 234, 0.8);
+            }
+            88% {
+                transform: scale(1.01);
+                color: #667eea;
+            }
+            89% {
+                transform: scale(1.06);
+                color: #ffffff;
+                text-shadow: 
+                    0 0 25px rgba(255, 255, 255, 1),
+                    0 0 45px rgba(255, 255, 0, 0.9),
+                    0 0 65px rgba(255, 193, 7, 0.7);
+            }
+            90%, 92% {
+                transform: scale(1);
+                color: #667eea;
+            }
+        }
+
+        /* Alert Bell Icon */
+        .alert-bell {
+            position: relative;
+            cursor: pointer;
+            font-size: 1.5em;
+            color: #667eea;
+            transition: all 0.3s ease;
+            padding: 10px;
+            border-radius: 50%;
+        }
+
+        .alert-bell:hover {
+            background: rgba(102, 126, 234, 0.1);
+            transform: scale(1.1);
+        }
+
+        .alert-badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #f44336;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7em;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Alert Panel */
+        .alert-panel {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            width: 400px;
+            max-height: 600px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            display: none;
+            z-index: 2000;
+            overflow: hidden;
+            animation: slideIn 0.3s ease;
+        }
+
+        .alert-panel.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .alert-header h3 {
+            margin: 0;
+            font-size: 1.2em;
+        }
+
+        .alert-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5em;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .alert-close:hover {
+            transform: rotate(90deg);
+        }
+
+        .alert-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .alert-tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .alert-tab:hover {
+            background: #e9ecef;
+        }
+
+        .alert-tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: white;
+        }
+
+        .alert-list {
+            max-height: 450px;
+            overflow-y: auto;
+        }
+
+        .alert-item {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+            transition: background 0.3s ease;
+            cursor: pointer;
+        }
+
+        .alert-item:hover {
+            background: #f8f9fa;
+        }
+
+        .alert-item.unread {
+            background: #e8f5e9;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .alert-priority {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .priority-critical {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .priority-high {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+
+        .priority-medium {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .priority-low {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .alert-title {
+            font-weight: 600;
+            color: #333;
+            margin: 5px 0;
+        }
+
+        .alert-message {
+            font-size: 0.9em;
+            color: #666;
+            margin: 5px 0;
+        }
+
+        .alert-time {
+            font-size: 0.8em;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .alert-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .alert-btn {
+            padding: 5px 12px;
+            border: none;
+            border-radius: 5px;
+            font-size: 0.85em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .btn-acknowledge {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-acknowledge:hover {
+            background: #45a049;
+        }
+
+        .btn-resolve {
+            background: #2196F3;
+            color: white;
+        }
+
+        .btn-resolve:hover {
+            background: #0b7dda;
+        }
+
+        .btn-dismiss {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-dismiss:hover {
+            background: #da190b;
+        }
+
+        /* Animated Remove Button */
+        .btn-remove {
+            display: inline-block;
+            background-color: #c0392b;
+            min-width: 120px;
+            height: 40px;
+            line-height: 40px;
+            color: #fff;
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px 0 rgba(0,0,0,.2);
+            transition: all 0.25s cubic-bezier(0.310, -0.105, 0.430, 1.400);
+            border: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .btn-remove .btn-text,
+        .btn-remove .btn-icon {
+            display: block;
+            height: 100%;
+            text-align: center;
+            position: absolute;
+            top: 0;
+            transition: all 0.25s cubic-bezier(0.310, -0.105, 0.430, 1.400);
+        }
+
+        .btn-remove .btn-text {
+            width: 72%;
+            line-height: inherit;
+            text-transform: uppercase;
+            left: 0;
+        }
+
+        .btn-remove .btn-text:after {
+            content: '';
+            background-color: #a53125;
+            width: 2px;
+            height: 70%;
+            position: absolute;
+            top: 15%;
+            right: -1px;
+        }
+
+        .btn-remove .btn-icon {
+            width: 28%;
+            right: 0;
+            font-size: 18px;
+            line-height: 40px;
+        }
+
+        .btn-remove .icon-remove {
+            display: inline-block;
+        }
+
+        .btn-remove .icon-check {
+            display: none;
+        }
+
+        .btn-remove:hover .btn-text,
+        .btn-remove.success .btn-text {
+            left: -72%;
+            opacity: 0;
+        }
+
+        .btn-remove:hover .btn-icon,
+        .btn-remove.success .btn-icon {
+            width: 100%;
+            font-size: 24px;
+        }
+
+        .btn-remove.success {
+            background-color: #27ae60;
+        }
+
+        .btn-remove.success .icon-remove {
+            display: none;
+        }
+
+        .btn-remove.success .icon-check {
+            display: inline-block;
+        }
+
+        .btn-remove:hover {
+            opacity: .9;
+        }
+
+        .btn-remove:active {
+            opacity: 1;
+        }
+
+        .alert-empty {
+            padding: 40px;
+            text-align: center;
+            color: #999;
+        }
+
+        .alert-empty-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            color: #666;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            padding: 8px 15px;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .nav-links a.active {
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.15);
+            font-weight: 600;
+        }
+
+        .nav-links a.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 3px;
+            background: #667eea;
+            border-radius: 2px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin: 20px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Smooth content transitions */
+        .fade-in {
+            animation: fadeInUp 0.4s ease-out;
+        }
+        
+        .fade-out {
+            animation: fadeOut 0.2s ease-in;
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+        }
+
+        .section h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .section h3 {
+            color: #764ba2;
+            font-size: 1.5em;
+            margin: 20px 0 10px 0;
+        }
+
+        /* Timeline Selector */
+        .timeline-selector {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .timeline-selector h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .year-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .year-button {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            min-width: 60px;
+        }
+
+        .year-button:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .year-button.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            transform: scale(1.05);
+        }
+
+        .current-year-info {
+            margin-top: 15px;
+            padding: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        /* Home Section */
+        .hero {
+            text-align: center;
+            padding: 60px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 20px;
+        }
+
+        .hero h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        .hero p {
+            font-size: 1.3em;
+            line-height: 1.8;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            transition: opacity 0.3s ease;
+            will-change: opacity;
+            margin: 30px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card h3 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .stat-card p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        /* Detection Results */
+        .results-table {
+            overflow-x: auto;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .results-table table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        .results-table th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .results-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .results-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .risk-badge {
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .risk-high { background: #ffebee; color: #c62828; }
+        .risk-medium { background: #fff3e0; color: #ef6c00; }
+        .risk-low { background: #e8f5e8; color: #2e7d32; }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-flagged {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .status-under-investigation {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+
+        .status-normal {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+
+        /* Visualization */
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin: 20px 0;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 400px;
+        }
+
+        .meter-selector {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .meter-selector select {
+            padding: 10px 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            font-size: 1em;
+            margin-right: 15px;
+        }
+
+        /* Chart Legend */
+        .chart-legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 3px;
+            border-radius: 2px;
+        }
+
+        .legend-normal { background: #4CAF50; }
+        .legend-theft { background: #f44336; }
+        .legend-threshold { background: #FF9800; }
+
+        /* Year Comparison Styles */
+        .comparison-selector {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .comparison-selector select {
+            padding: 10px 15px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            font-size: 1em;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .comparison-selector select:hover {
+            border-color: #764ba2;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .comparison-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .comparison-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .comparison-card h3 {
+            color: white;
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+
+        .comparison-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .comparison-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .trend-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 10px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        .trend-up {
+            background: rgba(244, 67, 54, 0.3);
+            color: #ffebee;
+        }
+
+        .trend-down {
+            background: rgba(76, 175, 80, 0.3);
+            color: #e8f5e9;
+        }
+
+        .trend-stable {
+            background: rgba(255, 152, 0, 0.3);
+            color: #fff3e0;
+        }
+
+        .comparison-table {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .comparison-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .comparison-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .comparison-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .chart-container-comparison {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .improvement {
+            color: #2e7d32;
+            font-weight: 600;
+        }
+
+        .deterioration {
+            color: #c62828;
+            font-weight: 600;
+        }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .navbar-left {
+                position: static;
+                text-align: center;
+            }
+            
+            .navbar-left h1 {
+                font-size: 1.2em;
+            }
+            
+            .navbar-right {
+                position: static;
+                justify-content: center;
+            }
+            
+            .hero h1 {
+                font-size: 1.8em;
+                line-height: 1.2;
+            }
+            
+            .hero p {
+                font-size: 1em;
+                line-height: 1.4;
+            }
+            
+            .year-buttons {
+                gap: 5px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .year-button {
+                padding: 8px 12px;
+                font-size: 0.8em;
+                min-width: 60px;
+                margin: 2px;
+            }
+            
+            .timeline-selector {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .timeline-selector h3 {
+                font-size: 1.2em;
+                margin-bottom: 15px;
+            }
+            
+            .current-year-info {
+                font-size: 0.9em;
+                padding: 10px;
+            }
+            
+            .section {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .section h2 {
+                font-size: 1.5em;
+                margin-bottom: 15px;
+            }
+            
+            .section h3 {
+                font-size: 1.3em;
+                margin-bottom: 12px;
+            }
+            
+            .section p {
+                font-size: 0.95em;
+                line-height: 1.4;
+                margin-bottom: 12px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .stat-card {
+                padding: 15px;
+            }
+            
+            .stat-number {
+                font-size: 2em;
+            }
+            
+            .stat-label {
+                font-size: 0.9em;
+            }
+            
+            .detection-table {
+                overflow-x: auto;
+                font-size: 0.85em;
+            }
+            
+            .detection-table th,
+            .detection-table td {
+                padding: 8px 6px;
+                white-space: nowrap;
+            }
+            
+            .chart-container {
+                height: 300px;
+                margin: 15px 0;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                gap: 8px;
+                justify-content: center;
+            }
+            
+            .nav-links a {
+                padding: 8px 12px;
+                font-size: 0.9em;
+                margin: 2px;
+            }
+            
+            .alert-panel {
+                width: 95%;
+                max-width: 400px;
+                right: 10px;
+            }
+            
+            .alert-header h3 {
+                font-size: 1.1em;
+            }
+            
+            .alert-tabs {
+                font-size: 0.9em;
+            }
+            
+            .alert-item {
+                padding: 12px;
+                font-size: 0.9em;
+            }
+            
+            .alert-item h4 {
+                font-size: 1em;
+            }
+            
+            .alert-item p {
+                font-size: 0.85em;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .navbar {
+                padding: 10px 15px;
+            }
+            
+            .navbar-left h1 {
+                font-size: 1em;
+            }
+            
+            .hero h1 {
+                font-size: 1.5em;
+            }
+            
+            .hero p {
+                font-size: 0.9em;
+            }
+            
+            .year-button {
+                padding: 6px 10px;
+                font-size: 0.75em;
+                min-width: 50px;
+            }
+            
+            .timeline-selector {
+                padding: 15px;
+                margin: 5px;
+            }
+            
+            .timeline-selector h3 {
+                font-size: 1.1em;
+            }
+            
+            .section {
+                padding: 15px;
+                margin: 5px;
+            }
+            
+            .section h2 {
+                font-size: 1.3em;
+            }
+            
+            .section h3 {
+                font-size: 1.2em;
+            }
+            
+            .section p {
+                font-size: 0.9em;
+            }
+            
+            .stat-card {
+                padding: 12px;
+            }
+            
+            .stat-number {
+                font-size: 1.8em;
+            }
+            
+            .stat-label {
+                font-size: 0.8em;
+            }
+            
+            .chart-container {
+                height: 250px;
+            }
+            
+            .nav-links a {
+                padding: 6px 10px;
+                font-size: 0.8em;
+            }
+            
+            .detection-table {
+                font-size: 0.8em;
+            }
+            
+            .detection-table th,
+            .detection-table td {
+                padding: 6px 4px;
+            }
+            
+            .alert-panel {
+                width: 98%;
+                right: 5px;
+            }
+        }
+        
+        /* Landscape mobile optimization */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .navbar {
+                padding: 10px 20px;
+                flex-direction: row;
+                justify-content: space-between;
+            }
+            
+            .navbar-left {
+                position: static;
+            }
+            
+            .navbar-right {
+                position: static;
+            }
+            
+            .hero h1 {
+                font-size: 1.6em;
+            }
+            
+            .hero p {
+                font-size: 0.95em;
+            }
+            
+            .year-buttons {
+                gap: 3px;
+            }
+            
+            .year-button {
+                padding: 6px 10px;
+                font-size: 0.75em;
+            }
+            
+            .timeline-selector {
+                padding: 15px;
+            }
+            
+            .section {
+                padding: 15px;
+            }
+            
+            .chart-container {
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="navbar-left">
+            <h1><span class="lightning-icon">⚡</span> Power Theft Detection System</h1>
+        </div>
+        <div class="navbar-right">
+            <div class="alert-bell" onclick="toggleAlertPanel()">
+                🔔
+                <span class="alert-badge" id="alertBadge">0</span>
+            </div>
+            <a href="/logout" style="text-decoration: none;">
+                <button class="logout-btn">
+                    <span>🚪</span>
+                    <span>Logout</span>
+                </button>
+            </a>
+        </div>
+    </div>
+
+    <!-- Alert Panel -->
+    <div class="alert-panel" id="alertPanel">
+        <div class="alert-header">
+            <h3>🔔 Alerts & Notifications</h3>
+            <button class="alert-close" onclick="toggleAlertPanel()">×</button>
+        </div>
+        <div class="alert-tabs">
+            <div class="alert-tab active" onclick="switchAlertTab('new')">New (<span id="newCount">0</span>)</div>
+            <div class="alert-tab" onclick="switchAlertTab('acknowledged')">Acknowledged</div>
+            <div class="alert-tab" onclick="switchAlertTab('resolved')">Resolved</div>
+        </div>
+        <div class="alert-list" id="alertList">
+            <!-- Alerts will be populated here -->
+        </div>
+    </div>
+
+    <div style="padding: 15px 50px; background: rgba(255, 255, 255, 0.95); box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+        <div class="nav-links">
+            <a onclick="showSection('home')" class="active">Home</a>
+            <a onclick="showSection('problem')">Problem Statement</a>
+            <a onclick="showSection('objectives')">Objectives</a>
+            <a onclick="showSection('methodology')">Methodology</a>
+            <a onclick="showSection('results')">Detection Results</a>
+            <a onclick="showSection('visualization')">Visualization</a>
+            <a onclick="showSection('comparison')">Year Comparison</a>
+            <a onclick="showSection('how-it-works')">How It Works</a>
+            <a onclick="showSection('future')">Future Scope</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Timeline Selector (Always Visible) -->
+        <div class="timeline-selector">
+            <h3>📅 Select Year for Analysis</h3>
+            <div class="year-buttons" id="yearButtons">
+                <!-- Year buttons will be loaded here -->
+            </div>
+            <div class="current-year-info" id="currentYearInfo">
+                Select a year to view specific data
+            </div>
+        </div>
+
+        <!-- Home Section -->
+        <div id="home" class="section active">
+            <div class="hero">
+                <h1>AI-Based Power Theft Detection System</h1>
+                <p>Advanced machine learning solution for detecting electricity theft in smart grids using consumption pattern analysis, anomaly detection, and real-time monitoring with 96.8% accuracy.</p>
+            </div>
+            
+            <div class="stats-grid" id="statsGrid">
+                <!-- Stats will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Problem Statement -->
+        <div id="problem" class="section">
+            <h2>Problem Statement</h2>
+            <h3>Challenge</h3>
+            <p>Electricity theft is a major concern for power distribution companies worldwide, causing significant financial losses and grid instability. Traditional detection methods are inefficient and often fail to identify sophisticated theft techniques.</p>
+            
+            <h3>Impact</h3>
+            <ul>
+                <li><strong>Financial Losses:</strong> Billions of dollars lost annually due to undetected theft</li>
+                <li><strong>Grid Instability:</strong> Unauthorized consumption affects power quality and reliability</li>
+                <li><strong>Safety Risks:</strong> Illegal connections pose fire and electrocution hazards</li>
+                <li><strong>Revenue Loss:</strong> Legitimate customers bear the cost through higher tariffs</li>
+            </ul>
+        </div>
+
+        <!-- Objectives -->
+        <div id="objectives" class="section">
+            <h2>Project Objectives</h2>
+            <div class="objectives-list">
+                <div class="objective-item">
+                    <h3>🎯 Primary Objective</h3>
+                    <p>Develop an AI-based intrusion detection system to identify electricity theft patterns with high accuracy and minimal false positives.</p>
+                </div>
+                <div class="objective-item">
+                    <h3>📊 Data Analysis</h3>
+                    <p>Analyze consumption patterns from 2015-2025 to identify anomalies and suspicious usage behaviors.</p>
+                </div>
+                <div class="objective-item">
+                    <h3>🤖 Machine Learning</h3>
+                    <p>Implement advanced ML algorithms including Random Forest, Neural Networks, and ensemble methods.</p>
+                </div>
+                <div class="objective-item">
+                    <h3>⚡ Real-time Detection</h3>
+                    <p>Provide real-time monitoring and alert system for immediate theft detection and response.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Methodology -->
+        <div id="methodology" class="section">
+            <h2>Methodology</h2>
+            <h3>Dataset</h3>
+            <p><strong>Extended SGCC Dataset (2015-2025)</strong></p>
+            <ul>
+                <li>42,372 customers with 11 years of consumption data</li>
+                <li>4,321 days of daily consumption readings</li>
+                <li>Real utility company data from State Grid Corporation of China</li>
+                <li>8.5% theft rate with realistic consumption patterns</li>
+            </ul>
+
+            <h3>Machine Learning Pipeline</h3>
+            <ol>
+                <li><strong>Data Preprocessing:</strong> Cleaning, normalization, and feature engineering</li>
+                <li><strong>Feature Extraction:</strong> Statistical features, temporal patterns, and anomaly indicators</li>
+                <li><strong>Class Balancing:</strong> SMOTE technique to handle imbalanced dataset</li>
+                <li><strong>Model Training:</strong> Random Forest with optimized hyperparameters</li>
+                <li><strong>Evaluation:</strong> Cross-validation and performance metrics analysis</li>
+            </ol>
+
+            <h3>Key Features</h3>
+            <ul>
+                <li>Daily consumption patterns (4,321 features)</li>
+                <li>Statistical aggregations (mean, std, max, min)</li>
+                <li>Temporal features (seasonal patterns, trends)</li>
+                <li>Anomaly indicators (zero consumption days, unusual patterns)</li>
+            </ul>
+        </div>
+
+        <!-- Detection Results -->
+        <div id="results" class="section">
+            <h2>Detection Results</h2>
+            <p>Real-time theft detection results based on consumption pattern analysis for the selected year:</p>
+            
+            <div class="results-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Meter ID</th>
+                            <th>Customer</th>
+                            <th>Location</th>
+                            <th>Location Type</th>
+                            <th>Voltage (V)</th>
+                            <th>Current (A)</th>
+                            <th>Power Factor</th>
+                            <th>Unit Consumed (kWh)</th>
+                            <th>Expected (kWh)</th>
+                            <th>Theft Probability</th>
+                            <th>Risk Level</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsTable">
+                        <tr>
+                            <td colspan="13" style="text-align: center; padding: 20px;">Select a year to view detection results</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Visualization -->
+        <div id="visualization" class="section">
+            <h2>Consumption Visualization</h2>
+            <p>Graphical representation of consumption data with detected anomalies highlighted for the selected year:</p>
+            
+            <div class="meter-selector">
+                <select id="meterSelect">
+                    <option value="">Select Meter</option>
+                </select>
+                <button class="btn" onclick="loadConsumptionChart()">Load Chart</button>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-wrapper">
+                    <canvas id="consumptionChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-legend">
+                <div class="legend-item">
+                    <div class="legend-color legend-normal"></div>
+                    <span>Normal Consumption Pattern</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color legend-theft"></div>
+                    <span>Detected Theft/Anomaly</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color legend-threshold"></div>
+                    <span>Threshold</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- How It Works -->
+        <div id="how-it-works" class="section">
+            <h2>⚡ How Theft Detection Works - Live Demo</h2>
+            
+            <!-- Interactive Visualization -->
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px; border-radius: 20px; margin: 30px 0; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+                <h3 style="color: white; text-align: center; margin-bottom: 30px;">🎯 Interactive Power Flow Simulation</h3>
+                
+                <!-- Control Panel -->
+                <div style="background: white; padding: 20px; border-radius: 15px; margin-bottom: 30px;">
+                    
+                    <!-- Auto Generator Controls -->
+                    <div style="border-top: 2px solid #e9ecef; padding-top: 20px;">
+                        <div style="text-align: center; margin-bottom: 15px;">
+                            <strong style="color: #667eea; font-size: 1.1em;">🔄 Auto Generator Mode</strong>
+                        </div>
+                        <div style="display: flex; justify-content: center; gap: 15px;">
+                            <button id="startAutoBtn" onclick="startAutoGenerator()" style="padding: 12px 25px; background: #2196F3; color: white; border: none; border-radius: 10px; font-size: 1em; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                                ▶️ Start Auto
+                            </button>
+                            <button id="stopAutoBtn" onclick="stopAutoGenerator()" style="padding: 12px 25px; background: #9E9E9E; color: white; border: none; border-radius: 10px; font-size: 1em; font-weight: 600; cursor: pointer; transition: all 0.3s;" disabled>
+                                ⏸️ Stop Auto
+                            </button>
+                        </div>
+                        <div style="text-align: center; margin-top: 10px; font-size: 0.9em; color: #666;">
+                            <span id="autoStatus">Auto mode: OFF</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Manual Control Slider -->
+                    <div style="margin-top: 20px; text-align: center;">
+                        <label style="font-weight: 600; color: #667eea; font-size: 1.1em;">Manual Current Control:</label>
+                        <input type="range" id="currentSlider" min="0" max="100" value="100" oninput="updateManualCurrent(this.value)" style="width: 60%; margin: 10px 0;">
+                        <div id="sliderValue" style="font-size: 1.2em; font-weight: 600; color: #764ba2;">100%</div>
+                    </div>
+                </div>
+                
+                <!-- Visualization Canvas -->
+                <div style="background: white; padding: 40px; border-radius: 15px; position: relative; min-height: 400px;">
+                    <!-- Power Grid -->
+                    <div style="position: absolute; left: 50px; top: 50px; text-align: center;">
+                        <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #FFD700, #FFA500); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5em; box-shadow: 0 5px 15px rgba(255,165,0,0.5);">
+                            ⚡
+                        </div>
+                        <div style="font-weight: 600; margin-top: 10px; color: #667eea;">Monitoring Center</div>
+                    </div>
+                    
+                    <!-- Animated Data Flow Line 1 (Smart Meter → Power Grid/Monitoring) -->
+                    <svg style="position: absolute; left: 130px; top: 85px; width: 150px; height: 10px;">
+                        <line x1="0" y1="5" x2="150" y2="5" stroke="#4CAF50" stroke-width="4" id="flowLine1"/>
+                        <circle r="6" fill="#4CAF50" id="flowDot1">
+                            <animateMotion dur="2s" repeatCount="indefinite" path="M150,5 L0,5"/>
+                        </circle>
+                    </svg>
+                    
+                    <!-- Smart Meter -->
+                    <div style="position: absolute; left: 280px; top: 30px; text-align: center;">
+                        <div id="meterBox" style="width: 100px; height: 120px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(102,126,234,0.5); transition: all 0.3s;">
+                            <div style="color: white; font-size: 2em; margin-bottom: 5px;">📊</div>
+                            <div id="meterReading" style="color: white; font-weight: 600; font-size: 1.2em;">0.50A</div>
+                            <div style="color: white; font-size: 0.8em; margin-top: 5px;">Smart Meter</div>
+                        </div>
+                        <div style="font-weight: 600; margin-top: 10px; color: #667eea;">Monitoring</div>
+                    </div>
+                    
+                    <!-- Animated Data Flow Line 2 (Smart Meter ← Customer) -->
+                    <svg style="position: absolute; left: 380px; top: 85px; width: 300px; height: 10px;">
+                        <defs>
+                            <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="1" refY="3" orient="auto">
+                                <polygon points="10 0, 0 3, 10 6" fill="#4CAF50" id="arrowFill"/>
+                            </marker>
+                        </defs>
+                        <line x1="0" y1="5" x2="290" y2="5" stroke="#4CAF50" stroke-width="4" marker-start="url(#arrowhead)" id="flowLine2"/>
+                        <circle r="6" fill="#4CAF50" id="flowDot2">
+                            <animateMotion dur="2s" repeatCount="indefinite" path="M280,5 L0,5"/>
+                        </circle>
+                    </svg>
+                    
+                    <!-- Customer Load -->
+                    <div style="position: absolute; left: 670px; top: 50px; text-align: center;">
+                        <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #4CAF50, #2e7d32); border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 2.5em; box-shadow: 0 5px 15px rgba(76,175,80,0.5);" id="customerLoad">
+                            🏠
+                        </div>
+                        <div style="font-weight: 600; margin-top: 10px; color: #667eea;">Customer</div>
+                    </div>
+                    
+                    <!-- Info Box on Right -->
+                    <div style="position: absolute; right: 30px; top: 50px; background: rgba(255,255,255,0.95); padding: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); width: 200px;">
+                        <div style="font-weight: 700; color: #667eea; margin-bottom: 15px; font-size: 1.1em;">📋 System Info</div>
+                        <div style="font-size: 0.9em; color: #666; line-height: 1.6;">
+                            <div style="margin-bottom: 10px;">
+                                <strong>Status:</strong><br>
+                                <span id="systemStatus" style="color: #4CAF50;">Active</span>
+                            </div>
+                            <div style="margin-bottom: 10px;">
+                                <strong>Voltage:</strong><br>
+                                <span>230V AC</span>
+                            </div>
+                            <div style="margin-bottom: 10px;">
+                                <strong>Frequency:</strong><br>
+                                <span>50 Hz</span>
+                            </div>
+                            <div>
+                                <strong>Power Factor:</strong><br>
+                                <span>0.95</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- AI Detection System -->
+                    <div style="position: absolute; left: 50%; transform: translateX(-50%); bottom: 40px; text-align: center;">
+                        <div id="aiSystem" style="background: linear-gradient(135deg, #667eea, #764ba2); padding: 20px 40px; border-radius: 15px; box-shadow: 0 5px 15px rgba(102,126,234,0.5); transition: all 0.3s;">
+                            <div style="color: white; font-size: 1.5em; margin-bottom: 10px;">🤖 AI Detection System</div>
+                            <div id="detectionStatus" style="color: white; font-weight: 600; font-size: 1.2em;">Monitoring...</div>
+                            <div id="theftProbability" style="color: white; font-size: 1.5em; margin-top: 10px; font-weight: 700;">0%</div>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <!-- Real-time Metrics -->
+                <div style="background: white; padding: 20px; border-radius: 15px; margin-top: 20px;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                        <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 10px;">
+                            <div style="color: #667eea; font-weight: 600; margin-bottom: 5px;">Expected Current</div>
+                            <div id="expectedCurrent" style="font-size: 2em; font-weight: 700; color: #4CAF50;">0.50A</div>
+                        </div>
+                        <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 10px;">
+                            <div style="color: #667eea; font-weight: 600; margin-bottom: 5px;">Actual Current</div>
+                            <div id="actualCurrent" style="font-size: 2em; font-weight: 700; color: #4CAF50;">0.50A</div>
+                        </div>
+                        <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 10px;">
+                            <div style="color: #667eea; font-weight: 600; margin-bottom: 5px;">Consumption Drop</div>
+                            <div id="consumptionDrop" style="font-size: 2em; font-weight: 700; color: #4CAF50;">0%</div>
+                        </div>
+                        <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 10px;">
+                            <div style="color: #667eea; font-weight: 600; margin-bottom: 5px;">Risk Level</div>
+                            <div id="riskLevel" style="font-size: 2em; font-weight: 700; color: #4CAF50;">LOW</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Detection Process Explanation -->
+            <h3>🔍 Detection Process</h3>
+            <ol style="font-size: 1.1em; line-height: 1.8;">
+                <li><strong>Data Collection:</strong> Smart meters collect consumption data every day</li>
+                <li><strong>Pattern Analysis:</strong> AI algorithms analyze consumption patterns</li>
+                <li><strong>Anomaly Detection:</strong> System identifies unusual consumption behaviors</li>
+                <li><strong>Risk Assessment:</strong> Machine learning models calculate theft probability using formula: <code>theft_probability = 1 - (actual_consumption / expected_consumption)</code></li>
+                <li><strong>Alert Generation:</strong> High-risk cases (>70% probability) are flagged for investigation</li>
+            </ol>
+
+            <h3>📊 Model Performance</h3>
+            <ul style="font-size: 1.1em; line-height: 1.8;">
+                <li><strong>Accuracy:</strong> 96.8% overall detection accuracy</li>
+                <li><strong>AUC-ROC:</strong> 0.982 area under the curve</li>
+                <li><strong>Precision:</strong> 92% for theft detection</li>
+                <li><strong>Recall:</strong> 69% theft case identification</li>
+            </ul>
+        </div>
+
+        <!-- Year Comparison -->
+        <div id="comparison" class="section">
+            <h2>📊 Year-over-Year Comparison</h2>
+            
+            <div class="comparison-selector">
+                <label style="font-weight: 600; color: #667eea;">Compare Years:</label>
+                <select id="compareYear1" onchange="loadComparison()">
+                    <option value="2024">2024</option>
+                    <option value="2023">2023</option>
+                    <option value="2022">2022</option>
+                    <option value="2021">2021</option>
+                    <option value="2020">2020</option>
+                    <option value="2019">2019</option>
+                    <option value="2018">2018</option>
+                    <option value="2017">2017</option>
+                    <option value="2016">2016</option>
+                    <option value="2015">2015</option>
+                </select>
+                <span style="font-weight: 600; color: #764ba2;">vs</span>
+                <select id="compareYear2" onchange="loadComparison()">
+                    <option value="2025" selected>2025</option>
+                    <option value="2024">2024</option>
+                    <option value="2023">2023</option>
+                    <option value="2022">2022</option>
+                    <option value="2021">2021</option>
+                    <option value="2020">2020</option>
+                    <option value="2019">2019</option>
+                    <option value="2018">2018</option>
+                    <option value="2017">2017</option>
+                    <option value="2016">2016</option>
+                    <option value="2015">2015</option>
+                </select>
+                <button class="btn" onclick="loadComparison()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">Compare</button>
+            </div>
+
+            <div id="comparisonResults">
+                <div class="comparison-grid">
+                    <div class="comparison-card">
+                        <h3 id="year1Display">2024</h3>
+                        <div class="comparison-label">Flagged Customers</div>
+                        <div class="comparison-value" id="year1Flagged">-</div>
+                        <div class="comparison-label">Avg Consumption</div>
+                        <div class="comparison-value" id="year1Consumption" style="font-size: 1.8em;">-</div>
+                    </div>
+                    <div class="comparison-card">
+                        <h3 id="year2Display">2025</h3>
+                        <div class="comparison-label">Flagged Customers</div>
+                        <div class="comparison-value" id="year2Flagged">-</div>
+                        <div class="comparison-label">Avg Consumption</div>
+                        <div class="comparison-value" id="year2Consumption" style="font-size: 1.8em;">-</div>
+                    </div>
+                </div>
+
+                <div class="comparison-table">
+                    <h3 style="color: #667eea; margin-bottom: 15px;">📈 Trend Analysis</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th id="tableYear1">2024</th>
+                                <th id="tableYear2">2025</th>
+                                <th>Change</th>
+                                <th>Trend</th>
+                            </tr>
+                        </thead>
+                        <tbody id="comparisonTableBody">
+                            <tr>
+                                <td>Total Customers</td>
+                                <td id="totalCustomers1">-</td>
+                                <td id="totalCustomers2">-</td>
+                                <td id="totalCustomersChange">-</td>
+                                <td id="totalCustomersTrend">-</td>
+                            </tr>
+                            <tr>
+                                <td>Flagged for Theft</td>
+                                <td id="flaggedCustomers1">-</td>
+                                <td id="flaggedCustomers2">-</td>
+                                <td id="flaggedCustomersChange">-</td>
+                                <td id="flaggedCustomersTrend">-</td>
+                            </tr>
+                            <tr>
+                                <td>Theft Rate (%)</td>
+                                <td id="theftRate1">-</td>
+                                <td id="theftRate2">-</td>
+                                <td id="theftRateChange">-</td>
+                                <td id="theftRateTrend">-</td>
+                            </tr>
+                            <tr>
+                                <td>Avg Consumption (kWh)</td>
+                                <td id="avgConsumption1">-</td>
+                                <td id="avgConsumption2">-</td>
+                                <td id="avgConsumptionChange">-</td>
+                                <td id="avgConsumptionTrend">-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="chart-container-comparison">
+                    <h3 style="color: #667eea; margin-bottom: 20px;">📊 Multi-Year Theft Trend (2015-2025)</h3>
+                    <canvas id="trendChart" style="max-height: 400px;"></canvas>
+                </div>
+
+                <div style="background: #e8f5e9; padding: 20px; border-radius: 10px; margin-top: 20px; border-left: 4px solid #2e7d32;">
+                    <h3 style="color: #2e7d32; margin-bottom: 10px;">💡 Key Insights</h3>
+                    <div id="insightsText" style="color: #1b5e20; line-height: 1.8;">
+                        Select years to compare and view detailed insights...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Future Scope -->
+        <div id="future" class="section">
+            <h2>Future Scope</h2>
+            <h3>Enhancements</h3>
+            <ul>
+                <li><strong>Deep Learning:</strong> Implement CNN-LSTM for temporal pattern recognition</li>
+                <li><strong>Real-time Processing:</strong> Stream processing for instant detection</li>
+                <li><strong>IoT Integration:</strong> Smart meter network integration</li>
+                <li><strong>Mobile App:</strong> Field officer mobile application</li>
+                <li><strong>Blockchain:</strong> Secure and transparent audit trail</li>
+            </ul>
+
+            <h3>Scalability</h3>
+            <ul>
+                <li>Cloud deployment for handling millions of customers</li>
+                <li>Distributed computing for real-time processing</li>
+                <li>API integration with existing utility systems</li>
+                <li>Multi-region deployment capabilities</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let currentYear = 2025;
+        let consumptionChart = null;
+        
+        // Cache for API responses to prevent re-fetching
+        const dataCache = {
+            statistics: {},
+            detections: {},
+            consumption: {}
+        };
+
+        // Initialize the application
+        async function initializeApp() {
+            console.log("🚀 Initializing Enhanced Interface...");
+            try {
+                await loadAvailableYears();
+                await selectYear(2025); // Default to 2025
+                console.log("✅ Interface initialized successfully");
+            } catch (error) {
+                console.error("❌ Error initializing interface:", error);
+                // Still try to create basic interface
+                createFallbackYearButtons();
+            }
+        }
+
+        // Load available years
+        async function loadAvailableYears() {
+            try {
+                const response = await fetch('/api/available-years');
+                const data = await response.json();
+                
+                const yearButtons = document.getElementById('yearButtons');
+                yearButtons.innerHTML = '';
+                
+                data.years.forEach(year => {
+                    const button = document.createElement('button');
+                    button.className = 'year-button';
+                    button.textContent = year;
+                    button.onclick = () => selectYear(year);
+                    yearButtons.appendChild(button);
+                });
+                
+            } catch (error) {
+                console.error('Error loading years:', error);
+                // Fallback years
+                const yearButtons = document.getElementById('yearButtons');
+                for (let year = 2015; year <= 2025; year++) {
+                    const button = document.createElement('button');
+                    button.className = 'year-button';
+                    button.textContent = year;
+                    button.onclick = () => selectYear(year);
+                    yearButtons.appendChild(button);
+                }
+            }
+        }
+
+        function createFallbackYearButtons() {
+            console.log("🔧 Creating fallback year buttons...");
+            const yearButtons = document.getElementById('yearButtons');
+            yearButtons.innerHTML = '';
+
+            for (let year = 2015; year <= 2025; year++) {
+                const button = document.createElement('button');
+                button.className = 'year-button';
+                button.textContent = year;
+                button.onclick = () => selectYear(year);
+                yearButtons.appendChild(button);
+            }
+
+            // Auto-select 2025
+            const button2025 = yearButtons.querySelector('button:last-child');
+            if (button2025) {
+                button2025.classList.add('active');
+                document.getElementById('currentYearInfo').textContent =
+                    '📊 Viewing data for 2025 | Click any year to switch';
+            }
+        }
+        async function selectYear(year) {
+            currentYear = year;
+            
+            // Update active button with smooth transition
+            document.querySelectorAll('.year-button').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent == year) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Update year info immediately
+            document.getElementById('currentYearInfo').textContent = 
+                `📊 Viewing data for ${year} | Click any year to switch`;
+            
+            // Check if data is cached - if so, load instantly
+            const isCached = dataCache.statistics[year] && dataCache.detections[year];
+            
+            if (!isCached) {
+                // Show loading indicator only for non-cached data
+                const statsGrid = document.getElementById('statsGrid');
+                statsGrid.innerHTML = '<div style="text-align: center; padding: 20px; animation: fadeInUp 0.3s;">⏳ Loading...</div>';
+            }
+            
+            // Load year-specific data (will use cache if available)
+            await Promise.all([
+                loadYearStatistics(year),
+                loadDetectionResults(year),
+                updateMeterSelector(year)
+            ]);
+        }
+
+        // Load statistics for selected year
+        async function loadYearStatistics(year) {
+            try {
+                // Check cache first
+                if (dataCache.statistics[year]) {
+                    const data = dataCache.statistics[year];
+                } else {
+                    const response = await fetch(`/api/year-statistics/${year}`);
+                    const data = await response.json();
+                    // Store in cache
+                    dataCache.statistics[year] = data;
+                }
+                const data = dataCache.statistics[year];
+                
+                const statsGrid = document.getElementById('statsGrid');
+                statsGrid.innerHTML = `
+                    <div class="stat-card fade-in">
+                        <h3>${data.total_customers.toLocaleString()}</h3>
+                        <p>Total Customers</p>
+                    </div>
+                    <div class="stat-card fade-in" style="animation-delay: 0.1s;">
+                        <h3>${data.total_days}</h3>
+                        <p>Days in ${year}</p>
+                    </div>
+                    <div class="stat-card fade-in" style="animation-delay: 0.2s;">
+                        <h3>${data.avg_consumption} kWh</h3>
+                        <p>Average Consumption</p>
+                    </div>
+                    <div class="stat-card fade-in" style="animation-delay: 0.3s;">
+                        <h3>${data.flagged_customers}</h3>
+                        <p>Flagged Customers</p>
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error('Error loading statistics:', error);
+            }
+        }
+
+        // Load detection results for selected year
+        async function loadDetectionResults(year) {
+            try {
+                // Check cache first
+                let results;
+                if (dataCache.detections[year]) {
+                    results = dataCache.detections[year];
+                } else {
+                    const response = await fetch(`/api/year-detections/${year}`);
+                    results = await response.json();
+                    // Store in cache
+                    dataCache.detections[year] = results;
+                }
+                
+                const tbody = document.querySelector('#resultsTable');
+                tbody.innerHTML = '';
+                
+                if (results.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="13" style="text-align: center; padding: 20px;">No theft cases detected in ${year}</td></tr>`;
+                    return;
+                }
+                
+                let hasHighRisk = false;
+                let hasMediumRisk = false;
+                
+                results.forEach(result => {
+                    // Check for HIGH and MEDIUM risk cases
+                    if (result.risk_level === 'HIGH') {
+                        hasHighRisk = true;
+                    } else if (result.risk_level === 'MEDIUM') {
+                        hasMediumRisk = true;
+                    }
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><strong>${result.meter_id}</strong></td>
+                        <td>${result.customer_name}</td>
+                        <td>${result.location}</td>
+                        <td>${result.location_type || 'Residential'}</td>
+                        <td>${result.voltage || (220 + Math.floor(Math.random() * 20))}V</td>
+                        <td>${result.current || (Math.random() * 50 + 10).toFixed(2)}A</td>
+                        <td>${result.power_factor || (0.85 + Math.random() * 0.15).toFixed(2)}</td>
+                        <td>${result.avg_consumption} kWh</td>
+                        <td>${result.expected_consumption} kWh</td>
+                        <td><strong>${(result.theft_probability * 100).toFixed(1)}%</strong></td>
+                        <td><span class="risk-badge risk-${result.risk_level.toLowerCase()}">${result.risk_level}</span></td>
+                        <td><span class="status-badge status-${result.status.toLowerCase().replace(' ', '-')}">${result.status}</span></td>
+                        <td><button class="btn" style="padding: 5px 15px; font-size: 0.9em;" onclick="viewDetails('${result.meter_id}')">View</button></td>
+                    `;
+                    tbody.appendChild(row);
+                });
+                
+                // 🚨 NO SOUND ALARMS ON TIMELINE TAB - ONLY CONSOLE LOGS
+                if (hasHighRisk) {
+                    console.log(`🚨 HIGH RISK THEFT CASES DETECTED IN ${year} - NO SOUND ON TIMELINE`);
+                } else if (hasMediumRisk) {
+                    console.log(`⚠️ MEDIUM RISK THEFT CASES DETECTED IN ${year} - NO SOUND ON TIMELINE`);
+                }
+            } catch (error) {
+                console.error('Error loading results:', error);
+            }
+        }
+
+        // Update meter selector for the year
+        async function updateMeterSelector(year) {
+            try {
+                const response = await fetch(`/api/year-detections/${year}`);
+                const results = await response.json();
+                
+                const select = document.getElementById('meterSelect');
+                select.innerHTML = '<option value="">Select Meter</option>';
+                
+                results.forEach(result => {
+                    const option = document.createElement('option');
+                    option.value = result.meter_id;
+                    option.textContent = `${result.meter_id} - ${result.customer_name}`;
+                    select.appendChild(option);
+                });
+                
+            } catch (error) {
+                console.error('Error updating meter selector:', error);
+            }
+        }
+
+        // Load consumption chart for selected year
+        async function loadConsumptionChart() {
+            const meterId = document.getElementById('meterSelect').value;
+            if (!meterId) {
+                alert('Please select a meter first');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/year-consumption/${currentYear}/${meterId}`);
+                const data = await response.json();
+                
+                const ctx = document.getElementById('consumptionChart').getContext('2d');
+                
+                if (consumptionChart) {
+                    consumptionChart.destroy();
+                }
+                
+                // Create datasets
+                const normalData = data.consumption.map((val, idx) => 
+                    idx < data.anomaly_start ? val : null
+                );
+                const theftData = data.consumption.map((val, idx) => 
+                    idx >= data.anomaly_start ? val : null
+                );
+                
+                consumptionChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.days,
+                        datasets: [
+                            {
+                                label: 'Normal Consumption',
+                                data: normalData,
+                                borderColor: '#4CAF50',
+                                backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                                borderWidth: 2,
+                                pointRadius: 0,
+                                tension: 0.4
+                            },
+                            {
+                                label: 'Detected Theft',
+                                data: theftData,
+                                borderColor: '#f44336',
+                                backgroundColor: 'rgba(244, 67, 54, 0.1)',
+                                borderWidth: 2,
+                                pointRadius: 0,
+                                tension: 0.4
+                            },
+                            {
+                                label: 'Threshold',
+                                data: Array(data.total_days).fill(data.threshold),
+                                borderColor: '#FF9800',
+                                borderWidth: 2,
+                                borderDash: [5, 5],
+                                pointRadius: 0,
+                                fill: false
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: `Consumption Pattern - ${meterId} (${currentYear})`,
+                                font: { size: 16, weight: 'bold' }
+                            },
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: `Days in ${currentYear}`
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Consumption (kWh)'
+                                }
+                            }
+                        }
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Error loading consumption chart:', error);
+            }
+        }
+
+        // Show specific section with smooth transition
+        function showSection(sectionName) {
+            // Stop continuous alarm when switching away from "How It Works"
+            if (sectionName !== 'how-it-works' && alarmSoundInterval) {
+                stopContinuousAlarm(alarmSoundInterval);
+                alarmSoundInterval = null;
+                console.log('🔇 Continuous alarm stopped - switched away from How It Works tab');
+            }
+            
+            // Update nav links
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.classList.remove('active');
+            });
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
+            
+            // Get current active section
+            const currentSection = document.querySelector('.section.active');
+            const newSection = document.getElementById(sectionName);
+            
+            // If same section, do nothing
+            if (currentSection === newSection) return;
+            
+            // Fade out current section
+            if (currentSection) {
+                currentSection.style.animation = 'fadeOut 0.3s ease forwards';
+                setTimeout(() => {
+                    currentSection.classList.remove('active');
+                    currentSection.style.animation = '';
+                }, 300);
+            }
+            
+            // Fade in new section after a brief delay
+            setTimeout(() => {
+                newSection.classList.add('active');
+                // Scroll to top smoothly
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            }, currentSection ? 350 : 0);
+        }
+
+        // View details function
+        function viewDetails(meterId) {
+            document.getElementById('meterSelect').value = meterId;
+            showSection('visualization');
+            loadConsumptionChart();
+        }
+
+        // Year Comparison Functions
+        let trendChart = null;
+
+        async function loadComparison() {
+            const year1 = parseInt(document.getElementById('compareYear1').value);
+            const year2 = parseInt(document.getElementById('compareYear2').value);
+
+            if (year1 === year2) {
+                alert('Please select different years to compare!');
+                return;
+            }
+
+            try {
+                // Fetch data for both years
+                const [data1, data2] = await Promise.all([
+                    fetch(`/api/year-statistics/${year1}`).then(r => r.json()),
+                    fetch(`/api/year-statistics/${year2}`).then(r => r.json())
+                ]);
+
+                // Update year displays
+                document.getElementById('year1Display').textContent = year1;
+                document.getElementById('year2Display').textContent = year2;
+                document.getElementById('tableYear1').textContent = year1;
+                document.getElementById('tableYear2').textContent = year2;
+
+                // Update comparison cards
+                document.getElementById('year1Flagged').textContent = data1.flagged_customers;
+                document.getElementById('year2Flagged').textContent = data2.flagged_customers;
+                document.getElementById('year1Consumption').textContent = data1.avg_consumption + ' kWh';
+                document.getElementById('year2Consumption').textContent = data2.avg_consumption + ' kWh';
+
+                // Calculate metrics
+                const theftRate1 = ((data1.flagged_customers / data1.total_customers) * 100).toFixed(2);
+                const theftRate2 = ((data2.flagged_customers / data2.total_customers) * 100).toFixed(2);
+
+                // Update comparison table
+                document.getElementById('totalCustomers1').textContent = data1.total_customers.toLocaleString();
+                document.getElementById('totalCustomers2').textContent = data2.total_customers.toLocaleString();
+                document.getElementById('flaggedCustomers1').textContent = data1.flagged_customers;
+                document.getElementById('flaggedCustomers2').textContent = data2.flagged_customers;
+                document.getElementById('theftRate1').textContent = theftRate1 + '%';
+                document.getElementById('theftRate2').textContent = theftRate2 + '%';
+                document.getElementById('avgConsumption1').textContent = data1.avg_consumption;
+                document.getElementById('avgConsumption2').textContent = data2.avg_consumption;
+
+                // Calculate changes
+                const customerChange = data2.total_customers - data1.total_customers;
+                const flaggedChange = data2.flagged_customers - data1.flagged_customers;
+                const theftRateChange = (theftRate2 - theftRate1).toFixed(2);
+                const consumptionChange = (data2.avg_consumption - data1.avg_consumption).toFixed(2);
+
+                // Update change columns
+                document.getElementById('totalCustomersChange').textContent = 
+                    (customerChange >= 0 ? '+' : '') + customerChange.toLocaleString();
+                document.getElementById('flaggedCustomersChange').textContent = 
+                    (flaggedChange >= 0 ? '+' : '') + flaggedChange;
+                document.getElementById('theftRateChange').textContent = 
+                    (theftRateChange >= 0 ? '+' : '') + theftRateChange + '%';
+                document.getElementById('avgConsumptionChange').textContent = 
+                    (consumptionChange >= 0 ? '+' : '') + consumptionChange;
+
+                // Update trend indicators
+                updateTrendIndicator('totalCustomersTrend', customerChange, false);
+                updateTrendIndicator('flaggedCustomersTrend', flaggedChange, true); // More flagged = bad
+                updateTrendIndicator('theftRateTrend', theftRateChange, true); // Higher rate = bad
+                updateTrendIndicator('avgConsumptionTrend', consumptionChange, false);
+
+                // Generate insights
+                generateInsights(year1, year2, data1, data2, theftRate1, theftRate2);
+
+                // Load multi-year trend chart
+                await loadTrendChart();
+
+            } catch (error) {
+                console.error('Error loading comparison:', error);
+                alert('Error loading comparison data. Please try again.');
+            }
+        }
+
+        function updateTrendIndicator(elementId, change, isNegativeBad) {
+            const element = document.getElementById(elementId);
+            let trendClass, trendIcon, trendText;
+
+            if (Math.abs(change) < 0.01) {
+                trendClass = 'trend-stable';
+                trendIcon = '➡️';
+                trendText = 'Stable';
+            } else if (change > 0) {
+                if (isNegativeBad) {
+                    trendClass = 'trend-up';
+                    trendIcon = '⬆️';
+                    trendText = 'Increased';
+                } else {
+                    trendClass = 'trend-down';
+                    trendIcon = '⬆️';
+                    trendText = 'Increased';
+                }
+            } else {
+                if (isNegativeBad) {
+                    trendClass = 'trend-down';
+                    trendIcon = '⬇️';
+                    trendText = 'Decreased';
+                } else {
+                    trendClass = 'trend-up';
+                    trendIcon = '⬇️';
+                    trendText = 'Decreased';
+                }
+            }
+
+            element.innerHTML = `<span class="trend-indicator ${trendClass}">${trendIcon} ${trendText}</span>`;
+        }
+
+        function generateInsights(year1, year2, data1, data2, theftRate1, theftRate2) {
+            const flaggedChange = data2.flagged_customers - data1.flagged_customers;
+            const theftRateChange = (theftRate2 - theftRate1).toFixed(2);
+            const consumptionChange = (data2.avg_consumption - data1.avg_consumption).toFixed(2);
+
+            let insights = [];
+
+            // Theft rate insight
+            if (theftRateChange > 0) {
+                insights.push(`⚠️ <strong>Theft rate increased by ${theftRateChange}%</strong> from ${year1} to ${year2}. This indicates a deterioration in grid security.`);
+            } else if (theftRateChange < 0) {
+                insights.push(`✅ <strong>Theft rate decreased by ${Math.abs(theftRateChange)}%</strong> from ${year1} to ${year2}. This shows improvement in detection and prevention.`);
+            } else {
+                insights.push(`➡️ Theft rate remained stable at ${theftRate2}% between ${year1} and ${year2}.`);
+            }
+
+            // Flagged customers insight
+            if (flaggedChange > 0) {
+                insights.push(`📈 <strong>${flaggedChange} more customers were flagged</strong> for potential theft in ${year2} compared to ${year1}.`);
+            } else if (flaggedChange < 0) {
+                insights.push(`📉 <strong>${Math.abs(flaggedChange)} fewer customers were flagged</strong> for theft in ${year2}, indicating improved compliance.`);
+            }
+
+            // Consumption insight
+            if (consumptionChange > 0) {
+                insights.push(`💡 Average consumption increased by ${consumptionChange} kWh, which could indicate economic growth or increased usage.`);
+            } else if (consumptionChange < 0) {
+                insights.push(`💡 Average consumption decreased by ${Math.abs(consumptionChange)} kWh, possibly due to energy efficiency measures or theft.`);
+            }
+
+            // Overall assessment
+            if (theftRateChange < -1) {
+                insights.push(`<br><strong>🎯 Overall Assessment:</strong> Significant improvement in theft prevention between ${year1} and ${year2}. The detection system is performing well.`);
+            } else if (theftRateChange > 1) {
+                insights.push(`<br><strong>🎯 Overall Assessment:</strong> Theft incidents are increasing. Recommend enhanced monitoring and investigation for ${year2}.`);
+            } else {
+                insights.push(`<br><strong>🎯 Overall Assessment:</strong> Theft rates are relatively stable. Continue current monitoring protocols.`);
+            }
+
+            document.getElementById('insightsText').innerHTML = insights.join('<br><br>');
+        }
+
+        async function loadTrendChart() {
+            try {
+                // Fetch data for all years
+                const years = [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025];
+                const promises = years.map(year => 
+                    fetch(`/api/year-statistics/${year}`).then(r => r.json())
+                );
+                const allData = await Promise.all(promises);
+
+                // Calculate theft rates
+                const theftRates = allData.map(data => 
+                    ((data.flagged_customers / data.total_customers) * 100).toFixed(2)
+                );
+                const flaggedCustomers = allData.map(data => data.flagged_customers);
+
+                const ctx = document.getElementById('trendChart').getContext('2d');
+
+                if (trendChart) {
+                    trendChart.destroy();
+                }
+
+                trendChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: years,
+                        datasets: [
+                            {
+                                label: 'Theft Rate (%)',
+                                data: theftRates,
+                                borderColor: '#f44336',
+                                backgroundColor: 'rgba(244, 67, 54, 0.1)',
+                                borderWidth: 3,
+                                pointRadius: 5,
+                                pointHoverRadius: 7,
+                                tension: 0.4,
+                                yAxisID: 'y'
+                            },
+                            {
+                                label: 'Flagged Customers',
+                                data: flaggedCustomers,
+                                borderColor: '#667eea',
+                                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                                borderWidth: 3,
+                                pointRadius: 5,
+                                pointHoverRadius: 7,
+                                tension: 0.4,
+                                yAxisID: 'y1'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false,
+                        },
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Power Theft Trends (2015-2025)',
+                                font: { size: 16, weight: 'bold' }
+                            },
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                type: 'linear',
+                                display: true,
+                                position: 'left',
+                                title: {
+                                    display: true,
+                                    text: 'Theft Rate (%)'
+                                }
+                            },
+                            y1: {
+                                type: 'linear',
+                                display: true,
+                                position: 'right',
+                                title: {
+                                    display: true,
+                                    text: 'Flagged Customers'
+                                },
+                                grid: {
+                                    drawOnChartArea: false,
+                                }
+                            }
+                        }
+                    }
+                });
+
+            } catch (error) {
+                console.error('Error loading trend chart:', error);
+            }
+        }
+
+        // Alert Management System
+        let alerts = [];
+        let currentAlertTab = 'new';
+
+        function initializeAlerts() {
+            // Generate sample alerts based on detection results
+            alerts = [
+                {
+                    id: 1,
+                    priority: 'critical',
+                    title: 'Critical Theft Detected',
+                    message: 'Customer MTR-2025-00001 shows 95% theft probability in Zone 11',
+                    time: '2 minutes ago',
+                    status: 'new',
+                    meterId: 'MTR-2025-00001'
+                },
+                {
+                    id: 2,
+                    priority: 'high',
+                    title: 'High Risk Customer Flagged',
+                    message: 'Customer MTR-2025-00002 exceeded consumption threshold by 85%',
+                    time: '15 minutes ago',
+                    status: 'new',
+                    meterId: 'MTR-2025-00002'
+                },
+                {
+                    id: 3,
+                    priority: 'high',
+                    title: 'Suspicious Pattern Detected',
+                    message: 'Unusual consumption drop detected in Zone 13, Sector C',
+                    time: '1 hour ago',
+                    status: 'new',
+                    meterId: 'MTR-2025-00003'
+                },
+                {
+                    id: 4,
+                    priority: 'medium',
+                    title: 'Investigation Required',
+                    message: 'Customer MTR-2025-00004 shows irregular consumption pattern',
+                    time: '3 hours ago',
+                    status: 'new',
+                    meterId: 'MTR-2025-00004'
+                },
+                {
+                    id: 5,
+                    priority: 'critical',
+                    title: 'Multiple Theft Cases',
+                    message: '5 customers in Zone 15 flagged for potential theft',
+                    time: '5 hours ago',
+                    status: 'acknowledged',
+                    meterId: null
+                },
+                {
+                    id: 6,
+                    priority: 'low',
+                    title: 'System Update',
+                    message: 'Detection model updated with latest data',
+                    time: '1 day ago',
+                    status: 'resolved',
+                    meterId: null
+                }
+            ];
+            
+            updateAlertBadge();
+            renderAlerts();
+        }
+
+        function toggleAlertPanel() {
+            const panel = document.getElementById('alertPanel');
+            panel.classList.toggle('active');
+        }
+
+        function switchAlertTab(tab) {
+            currentAlertTab = tab;
+            
+            // Update tab styling
+            document.querySelectorAll('.alert-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            renderAlerts();
+        }
+
+        function updateAlertBadge() {
+            const newAlerts = alerts.filter(a => a.status === 'new').length;
+            document.getElementById('alertBadge').textContent = newAlerts;
+            document.getElementById('newCount').textContent = newAlerts;
+            
+            // Hide badge if no new alerts
+            if (newAlerts === 0) {
+                document.getElementById('alertBadge').style.display = 'none';
+            } else {
+                document.getElementById('alertBadge').style.display = 'flex';
+            }
+        }
+
+        function renderAlerts() {
+            const alertList = document.getElementById('alertList');
+            const filteredAlerts = alerts.filter(a => a.status === currentAlertTab);
+            
+            if (filteredAlerts.length === 0) {
+                alertList.innerHTML = `
+                    <div class="alert-empty">
+                        <div class="alert-empty-icon">📭</div>
+                        <p>No ${currentAlertTab} alerts</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            alertList.innerHTML = filteredAlerts.map(alert => `
+                <div class="alert-item ${alert.status === 'new' ? 'unread' : ''}" data-id="${alert.id}">
+                    <div>
+                        <span class="alert-priority priority-${alert.priority}">${alert.priority.toUpperCase()}</span>
+                        <div class="alert-title">${alert.title}</div>
+                        <div class="alert-message">${alert.message}</div>
+                        <div class="alert-time">⏰ ${alert.time}</div>
+                    </div>
+                    ${alert.status === 'new' ? `
+                        <div class="alert-actions">
+                            <button class="alert-btn btn-acknowledge" onclick="acknowledgeAlert(${alert.id})">
+                                ✓ Acknowledge
+                            </button>
+                            <button class="alert-btn btn-resolve" onclick="resolveAlert(${alert.id})">
+                                ✓✓ Resolve
+                            </button>
+                            ${alert.meterId ? `
+                                <button class="alert-btn btn-dismiss" onclick="viewAlertDetails('${alert.meterId}')">
+                                    👁️ View
+                                </button>
+                            ` : ''}
+                            <button class="btn-remove" onclick="removeAlert(event, ${alert.id})">
+                                <span class="btn-text">Remove</span>
+                                <div class="btn-icon">
+                                    <span class="icon-remove">✕</span>
+                                    <span class="icon-check">✓</span>
+                                </div>
+                            </button>
+                        </div>
+                    ` : alert.status === 'acknowledged' ? `
+                        <div class="alert-actions">
+                            <button class="alert-btn btn-resolve" onclick="resolveAlert(${alert.id})">
+                                ✓✓ Resolve
+                            </button>
+                            <button class="btn-remove" onclick="removeAlert(event, ${alert.id})">
+                                <span class="btn-text">Remove</span>
+                                <div class="btn-icon">
+                                    <span class="icon-remove">✕</span>
+                                    <span class="icon-check">✓</span>
+                                </div>
+                            </button>
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        function acknowledgeAlert(id) {
+            const alert = alerts.find(a => a.id === id);
+            if (alert) {
+                alert.status = 'acknowledged';
+                updateAlertBadge();
+                renderAlerts();
+                
+                // Show notification
+                showNotification('Alert acknowledged successfully', 'success');
+            }
+        }
+
+        function resolveAlert(id) {
+            const alert = alerts.find(a => a.id === id);
+            if (alert) {
+                alert.status = 'resolved';
+                updateAlertBadge();
+                renderAlerts();
+                
+                // Show notification
+                showNotification('Alert resolved successfully', 'success');
+            }
+        }
+
+        function removeAlert(event, id) {
+            const button = event.currentTarget;
+            
+            // Add success class for animation
+            button.classList.add('success');
+            
+            // Wait for animation to complete, then remove the alert
+            setTimeout(() => {
+                const alertIndex = alerts.findIndex(a => a.id === id);
+                if (alertIndex !== -1) {
+                    alerts.splice(alertIndex, 1);
+                    updateAlertBadge();
+                    renderAlerts();
+                    
+                    // Show notification
+                    showNotification('Alert removed successfully', 'success');
+                }
+            }, 1000);
+        }
+
+        function viewAlertDetails(meterId) {
+            // Close alert panel
+            toggleAlertPanel();
+            
+            // Navigate to detection results
+            showSection('results');
+            
+            // Scroll to the specific meter ID in the table
+            setTimeout(() => {
+                const row = document.querySelector(`td:contains('${meterId}')`);
+                if (row) {
+                    row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    row.parentElement.style.background = '#fff3cd';
+                    setTimeout(() => {
+                        row.parentElement.style.background = '';
+                    }, 2000);
+                }
+            }, 500);
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                background: ${type === 'success' ? '#4CAF50' : '#f44336'};
+                color: white;
+                padding: 15px 25px;
+                border-radius: 8px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                z-index: 3000;
+                animation: slideIn 0.3s ease;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'fadeOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', () => {
+            initializeApp();
+            initializeAlerts();
+            initAudio(); // Initialize audio context
+        });
+
+        // ========================================
+        // THEFT DETECTION SIMULATION FUNCTIONS
+        // ========================================
+        
+        let simulationInterval = null;
+        let autoGeneratorInterval = null;
+        let alarmSoundInterval = null;
+        let previousRiskLevel = 'NORMAL'; // Track previous risk state
+        const EXPECTED_CURRENT = 0.50; // 0.5 Amperes
+        
+        function simulateNormal() {
+            clearInterval(simulationInterval);
+            // Stop continuous alarm if running
+            if (alarmSoundInterval) {
+                stopContinuousAlarm(alarmSoundInterval);
+                alarmSoundInterval = null;
+            }
+            updateSimulation(100); // 100% current = normal
+            
+            // Show success message (only on "How It Works" tab)
+            const isHowItWorksTab = document.querySelector('.tab-button.active')?.textContent.includes('How It Works');
+            if (isHowItWorksTab) {
+                showNotification('✅ Normal operation restored', 'success');
+            }
+        }
+        
+        function simulateTheft() {
+            clearInterval(simulationInterval);
+            
+            // Animate theft scenario - gradually reduce current
+            let currentPercent = 100;
+            simulationInterval = setInterval(() => {
+                currentPercent -= 5;
+                if (currentPercent <= 30) {
+                    currentPercent = 30; // Stop at 30% (70% theft)
+                    clearInterval(simulationInterval);
+                }
+                updateSimulation(currentPercent);
+            }, 100);
+            
+            // Show alert after animation (only on "How It Works" tab)
+            setTimeout(() => {
+                const isHowItWorksTab = document.querySelector('.tab-button.active')?.textContent.includes('How It Works');
+                if (isHowItWorksTab) {
+                    showNotification('🚨 Theft detected! System triggered alarm', 'error');
+                }
+            }, 1500);
+        }
+        
+        function resetSimulation() {
+            clearInterval(simulationInterval);
+            // Stop continuous alarm if running
+            if (alarmSoundInterval) {
+                stopContinuousAlarm(alarmSoundInterval);
+                alarmSoundInterval = null;
+            }
+            updateSimulation(100);
+            document.getElementById('currentSlider').value = 100;
+            previousRiskLevel = 'NORMAL'; // Reset risk level tracking
+            
+            // Only show notification if on "How It Works" tab
+            const isHowItWorksTab = document.querySelector('.tab-button.active')?.textContent.includes('How It Works');
+            if (isHowItWorksTab) {
+                showNotification('🔄 Simulation reset', 'success');
+            }
+        }
+        
+        function updateManualCurrent(percent) {
+            clearInterval(simulationInterval);
+            updateSimulation(percent);
+            document.getElementById('sliderValue').textContent = percent + '%';
+        }
+        
+        function updateSimulation(currentPercent) {
+            const actualCurrent = (EXPECTED_CURRENT * currentPercent / 100).toFixed(2);
+            const drop = (100 - currentPercent).toFixed(0);
+            
+            // Calculate theft probability using the same formula as backend
+            const ratio = actualCurrent / EXPECTED_CURRENT;
+            let theftProb = 1 - ratio;
+            
+            // For display purposes, show 0% when at 100% to avoid confusion
+            if (currentPercent >= 100) {
+                theftProb = 0;
+            } else {
+                theftProb = Math.min(0.95, Math.max(0.3, theftProb));
+            }
+            const theftProbPercent = (theftProb * 100).toFixed(1);
+            
+            // Determine risk level
+            let riskLevel, riskColor, statusText;
+            if (theftProb > 0.7) {
+                riskLevel = 'HIGH';
+                riskColor = '#f44336';
+                statusText = '🚨 THEFT DETECTED!';
+            } else if (theftProb >= 0.4) {
+                riskLevel = 'MEDIUM';
+                riskColor = '#FF9800';
+                statusText = '⚠️ Suspicious Activity';
+            } else {
+                riskLevel = 'LOW';
+                riskColor = '#4CAF50';
+                statusText = '✅ Normal Operation';
+            }
+            
+            // Update UI elements
+            document.getElementById('meterReading').textContent = actualCurrent + 'A';
+            document.getElementById('actualCurrent').textContent = actualCurrent + 'A';
+            document.getElementById('actualCurrent').style.color = riskColor;
+            document.getElementById('consumptionDrop').textContent = drop + '%';
+            document.getElementById('consumptionDrop').style.color = riskColor;
+            document.getElementById('riskLevel').textContent = riskLevel;
+            document.getElementById('riskLevel').style.color = riskColor;
+            document.getElementById('detectionStatus').textContent = statusText;
+            document.getElementById('theftProbability').textContent = theftProbPercent + '%';
+            
+            // Update flow lines color
+            const flowColor = theftProb > 0.7 ? '#f44336' : (theftProb >= 0.4 ? '#FF9800' : '#4CAF50');
+            document.getElementById('flowLine1').setAttribute('stroke', flowColor);
+            document.getElementById('flowLine2').setAttribute('stroke', flowColor);
+            document.getElementById('flowDot1').setAttribute('fill', flowColor);
+            document.getElementById('flowDot2').setAttribute('fill', flowColor);
+            document.getElementById('arrowFill').setAttribute('fill', flowColor);
+            
+            // Update meter box color
+            if (theftProb > 0.7) {
+                document.getElementById('meterBox').style.background = 'linear-gradient(135deg, #f44336, #c62828)';
+                document.getElementById('meterBox').style.animation = 'shake 0.5s infinite';
+            } else if (theftProb >= 0.4) {
+                document.getElementById('meterBox').style.background = 'linear-gradient(135deg, #FF9800, #F57C00)';
+                document.getElementById('meterBox').style.animation = 'none';
+            } else {
+                document.getElementById('meterBox').style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
+                document.getElementById('meterBox').style.animation = 'none';
+            }
+            
+            // Update customer load icon
+            if (theftProb > 0.7) {
+                document.getElementById('customerLoad').style.background = 'linear-gradient(135deg, #f44336, #c62828)';
+                document.getElementById('customerLoad').innerHTML = '⚠️';
+            } else {
+                document.getElementById('customerLoad').style.background = 'linear-gradient(135deg, #4CAF50, #2e7d32)';
+                document.getElementById('customerLoad').innerHTML = '🏠';
+            }
+            
+            // Update AI system box
+            if (theftProb > 0.7) {
+                document.getElementById('aiSystem').style.background = 'linear-gradient(135deg, #f44336, #c62828)';
+                document.getElementById('aiSystem').style.animation = 'pulse 1s infinite';
+            } else if (theftProb >= 0.4) {
+                document.getElementById('aiSystem').style.background = 'linear-gradient(135deg, #FF9800, #F57C00)';
+                document.getElementById('aiSystem').style.animation = 'none';
+            } else {
+                document.getElementById('aiSystem').style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
+                document.getElementById('aiSystem').style.animation = 'none';
+            }
+            
+            // Determine current risk level
+            let currentRiskLevel;
+            if (theftProb > 0.7) {
+                currentRiskLevel = 'HIGH';
+            } else if (theftProb >= 0.4) {
+                currentRiskLevel = 'MEDIUM';
+            } else {
+                currentRiskLevel = 'NORMAL';
+            }
+            
+            // Only trigger alarm and notification when risk level changes
+            if (currentRiskLevel !== previousRiskLevel) {
+                // Stop any existing continuous alarm
+                if (alarmSoundInterval) {
+                    stopContinuousAlarm(alarmSoundInterval);
+                    alarmSoundInterval = null;
+                }
+                
+                // Check if we're on "How It Works" tab for notifications
+                const isHowItWorksTab = document.querySelector('.tab-button.active')?.textContent.includes('How It Works');
+                
+                if (currentRiskLevel === 'HIGH') {
+                    // 🚨 TRIGGER CONTINUOUS ALARM FOR HIGH RISK THEFT DETECTION
+                    alarmSoundInterval = playContinuousAlarm();
+                    if (isHowItWorksTab) {
+                        showNotification('🚨 HIGH RISK THEFT DETECTED!', 'error');
+                    }
+                    console.log('🚨 HIGH RISK THEFT DETECTED - CONTINUOUS ALARM TRIGGERED!');
+                } else if (currentRiskLevel === 'MEDIUM') {
+                    // 🔔 TRIGGER SINGLE ALARM FOR MEDIUM RISK THEFT DETECTION  
+                    playAlarmSound();
+                    if (isHowItWorksTab) {
+                        showNotification('⚠️ MEDIUM RISK THEFT DETECTED!', 'warning');
+                    }
+                    console.log('⚠️ MEDIUM RISK THEFT DETECTED - ALARM TRIGGERED!');
+                } else if (currentRiskLevel === 'NORMAL' && previousRiskLevel !== 'NORMAL') {
+                    // Show normal operation restored message
+                    if (isHowItWorksTab) {
+                        showNotification('✅ Normal operation restored', 'success');
+                    }
+                    console.log('✅ Normal operation restored');
+                }
+                
+                // Update previous risk level
+                previousRiskLevel = currentRiskLevel;
+            }
+        }
+        
+        // Add shake animation for meter box
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-5px); }
+                75% { transform: translateX(5px); }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Initialize audio context on page load
+        let audioContext = null;
+
+        function initAudio() {
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                console.log('🎵 Audio context initialized');
+            } catch (error) {
+                console.error('❌ Audio initialization failed:', error);
+            }
+        }
+
+
+        // ========================================
+        // ALARM SOUND FUNCTIONS
+        // ========================================
+
+        function playAlarmSound() {
+            if (!audioContext) {
+                initAudio();
+            }
+
+            try {
+                // Create oscillator for loud beep
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+
+                // High frequency loud beep (800 Hz)
+                oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                oscillator.type = 'square'; // Square wave for sharper sound
+
+                // Make it loud
+                gainNode.gain.setValueAtTime(0.7, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+
+                // Play for 0.3 seconds
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.3);
+
+                console.log('🔊 Alarm beep played');
+            } catch (error) {
+                console.error('❌ Sound playback failed:', error);
+            }
+        }
+
+        function playContinuousAlarm() {
+            // Play alarm sound every 0.6 seconds (faster for more urgency)
+            return setInterval(() => {
+                playAlarmSound();
+            }, 600);
+        }
+
+        function stopContinuousAlarm(intervalId) {
+            if (intervalId) {
+                clearInterval(intervalId);
+            }
+        }
+
+        // ========================================
+        // AUTO GENERATOR FUNCTIONS
+        // ========================================
+
+        function startAutoGenerator() {
+            stopAutoGenerator(); // Clear any existing interval
+
+            let currentPercent = 100;
+            let direction = -1; // Start by decreasing
+
+            autoGeneratorInterval = setInterval(() => {
+                // Change current by 2% each step
+                currentPercent += (direction * 2);
+
+                // Reverse direction at boundaries
+                if (currentPercent <= 20) {
+                    direction = 1; // Start increasing
+                    currentPercent = 20;
+                } else if (currentPercent >= 100) {
+                    direction = -1; // Start decreasing
+                    currentPercent = 100;
+                }
+
+                // Update simulation
+                updateSimulation(currentPercent);
+                document.getElementById('currentSlider').value = currentPercent;
+                document.getElementById('sliderValue').textContent = currentPercent + '%';
+
+            }, 200); // Update every 200ms for smooth animation
+
+            // Update UI
+            document.getElementById('startAutoBtn').disabled = true;
+            document.getElementById('stopAutoBtn').disabled = false;
+            document.getElementById('startAutoBtn').style.background = '#9E9E9E';
+            document.getElementById('stopAutoBtn').style.background = '#f44336';
+            document.getElementById('autoStatus').textContent = 'Auto mode: RUNNING';
+            document.getElementById('autoStatus').style.color = '#4CAF50';
+            document.getElementById('autoStatus').style.fontWeight = '600';
+
+            showNotification('▶️ Auto generator started', 'success');
+        }
+        
+        function stopAutoGenerator() {
+            if (autoGeneratorInterval) {
+                clearInterval(autoGeneratorInterval);
+                autoGeneratorInterval = null;
+            }
+            
+            // Update UI
+            document.getElementById('startAutoBtn').disabled = false;
+            document.getElementById('stopAutoBtn').disabled = true;
+            document.getElementById('startAutoBtn').style.background = '#2196F3';
+            document.getElementById('stopAutoBtn').style.background = '#9E9E9E';
+            document.getElementById('autoStatus').textContent = 'Auto mode: OFF';
+            document.getElementById('autoStatus').style.color = '#666';
+            document.getElementById('autoStatus').style.fontWeight = 'normal';
+            
+            if (autoGeneratorInterval !== null) {
+                showNotification('⏸️ Auto generator stopped', 'success');
+            }
+        }
+        
+    </script>
+</body>
+</html>
