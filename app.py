@@ -3,7 +3,7 @@ Enhanced Power Theft Detection System
 Original beautiful interface + Timeline feature for year selection (2015-2025)
 """
 
-from flask import Flask, render_template, jsonify, request, session, redirect, url_for
+from flask import Flask, render_template, jsonify, request, session, redirect, url_for, abort
 import pandas as pd
 import numpy as np
 import os
@@ -23,6 +23,25 @@ ADMIN_CREDENTIALS = {
 
 # Global variables
 df_extended = None
+
+
+def api_key_required(f):
+    """Optional API key auth for API routes.
+
+    If API_KEY is not set in the environment, the API remains accessible (prototype mode).
+    If API_KEY is set, clients must pass X-API-KEY header.
+    """
+
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        api_key = os.getenv('API_KEY')
+        if api_key:
+            provided = request.headers.get('X-API-KEY')
+            if provided != api_key:
+                abort(401)
+        return f(*args, **kwargs)
+
+    return decorated
 
 def load_extended_dataset():
     """Load the 2015-2025 extended dataset"""
@@ -137,7 +156,13 @@ def logout():
     session.clear()
     return redirect(url_for('login'))
 
+
+@app.route('/health')
+def health():
+    return jsonify({'status': 'ok'})
+
 @app.route('/api/available-years')
+@api_key_required
 @login_required
 def get_years():
     """Return available years"""
@@ -145,6 +170,7 @@ def get_years():
     return jsonify({'years': years})
 
 @app.route('/api/year-statistics/<int:year>')
+@api_key_required
 @login_required
 def get_year_statistics(year):
     """Get statistics for a specific year"""
@@ -270,6 +296,7 @@ def get_year_statistics(year):
 
 @app.route('/api/year-consumption/<int:year>')
 @app.route('/api/year-consumption/<int:year>/<meter_id>')
+@api_key_required
 @login_required
 def get_year_consumption(year, meter_id=None):
     """Get consumption data for a specific year and customer"""
@@ -436,6 +463,7 @@ def get_year_consumption(year, meter_id=None):
         })
 
 @app.route('/api/year-detections/<int:year>')
+@api_key_required
 @login_required
 def get_year_detections(year):
     """Get detection results for a specific year using proper theft probability formula"""

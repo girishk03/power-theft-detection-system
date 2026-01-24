@@ -6,19 +6,29 @@
 
 ## 📋 Project Overview
 
-This project implements an **AI-based Intrusion Detection System (IDS)** for detecting power theft in smart grid networks. Using advanced deep learning techniques including **CNN-LSTM**, **LSTM**, and **Neural Networks**, the system analyzes smart meter consumption patterns to identify anomalies and potential electricity theft in real-time.
+This project implements an **AI-based Intrusion Detection System (IDS)** for detecting power theft in smart grid networks. Using machine learning and deep learning techniques, the system analyzes smart meter consumption patterns to identify anomalies and potential electricity theft in **near real-time (simulated monitoring)**.
+
+## Scope
+- Theft detection via consumption anomaly patterns
+- Batch inference + near real-time simulated monitoring in the dashboard
+- Research / prototype-level system
+
+## Non-Goals
+- Hardware / meter firmware integration
+- Utility-scale deployment guarantees
+- Full production IAM / authorization
 
 ### 🎯 Objectives
 
 - **Develop an AI-based Intrusion Detection System** using deep learning techniques
 - **Handle data-related challenges** effectively (missing values, class imbalance)
 - **Enhance detection performance** through advanced feature engineering
-- **Provide real-time monitoring** and automated alert generation
+- **Provide near real-time (simulated) monitoring** and automated alert generation
 - **Support energy security** and grid sustainability
 
 ### ⚡ Key Features
 
-- **Real-time Theft Detection**: Continuous monitoring of power consumption patterns
+- **Near real-time (simulated) Theft Detection**: Monitoring workflow demonstrated via dashboard + API
 - **Multiple AI Models**: CNN-LSTM, LSTM, Neural Networks, and traditional ML models
 - **Advanced Feature Engineering**: Time-domain and frequency-domain feature extraction
 - **Anomaly Detection**: Statistical and ML-based anomaly detection
@@ -55,7 +65,7 @@ This project implements an **AI-based Intrusion Detection System (IDS)** for det
                        ▼
 ┌─────────────────────────────────────────────────────────────┐
 │         Intrusion Detection System (IDS)                    │
-│  • Real-time Theft Detection                                │
+│  • Near real-time (simulated) Theft Detection               │
 │  • Risk Classification (HIGH/MEDIUM/LOW)                    │
 │  • Anomaly Detection                                        │
 │  • Alert Generation & Management                            │
@@ -64,7 +74,7 @@ This project implements an **AI-based Intrusion Detection System (IDS)** for det
                        ▼
 ┌─────────────────────────────────────────────────────────────┐
 │              Web Dashboard & Monitoring                     │
-│  • Real-time Metrics                                        │
+│  • Near real-time (simulated) Metrics                       │
 │  • Alert Management                                         │
 │  • Visualization & Reports                                  │
 └─────────────────────────────────────────────────────────────┘
@@ -155,12 +165,18 @@ Access the dashboard at: **http://localhost:8105**
 
 ### 3. Use the Dashboard
 1. Click **"Initialize System"** to load the trained model
-2. View real-time statistics and metrics
+2. View near real-time (simulated) statistics and metrics
 3. Click **"Simulate Detection"** to test the system
 4. Monitor alerts and acknowledge them
 5. Export reports and detection logs
 
 ## 📊 Dataset
+
+See `DATASET.md` for dataset transparency and assumptions.
+
+This repository includes:
+- `data/raw/Electricity_Theft_Data.csv` (source dataset)
+- `data/sample_data.csv` (small illustrative sample)
 
 ### Sample Data Generation
 The system includes a built-in sample data generator that creates realistic smart meter consumption data:
@@ -226,15 +242,19 @@ Fully connected neural network for tabular data.
 - **SVM**: Support Vector Machine
 - **Decision Tree**: Single decision tree
 
-## 📈 Performance Metrics
+## Model Performance
 
-The system evaluates models using:
-- **Accuracy**: Overall correctness
-- **Precision**: True positive rate
-- **Recall**: Sensitivity to theft cases
-- **F1-Score**: Harmonic mean of precision and recall
-- **AUC-ROC**: Area under ROC curve
-- **Confusion Matrix**: True/False positives and negatives
+Metrics below are taken from `results/training_results.json`.
+
+| Model | Accuracy | Precision | Recall | F1 | AUC |
+|------|----------|-----------|--------|----|-----|
+| Random Forest (Main) | 87% | 0.84 | 0.82 | 0.83 | 0.91 |
+| Random Forest (Minimal) | 85% | 0.82 | 0.80 | 0.81 | 0.88 |
+
+### Plots
+If you generate plots during training/evaluation, commit them under `results/plots/`:
+- `confusion_matrix.png`
+- `roc_curve.png`
 
 ## 🔍 Feature Engineering
 
@@ -278,7 +298,7 @@ The system evaluates models using:
 
 ## 📱 Web Dashboard Features
 
-- **Real-time Monitoring**: Live system status and metrics
+- **Near real-time (simulated) Monitoring**: Live system status and metrics (simulated feed)
 - **Detection Statistics**: Total detections, theft rate, accuracy
 - **Alert Management**: View and acknowledge alerts
 - **Risk Distribution**: Visualization of risk levels
@@ -347,6 +367,27 @@ The system generates comprehensive visualizations:
 7. **Consumption Patterns**: Normal vs. theft patterns
 
 ## 🎓 Research References
+
+## Deployment (Docker)
+
+```bash
+docker build -t power-theft .
+docker run -p 5000:5000 power-theft
+```
+
+## Security Note
+
+This is a prototype. If `API_KEY` is set in the environment, `/api/*` routes require:
+
+- Header: `X-API-KEY: <your key>`
+
+If `API_KEY` is not set, API routes remain accessible after login.
+
+## Testing
+
+```bash
+pytest -q
+```
 
 Based on literature survey including:
 
