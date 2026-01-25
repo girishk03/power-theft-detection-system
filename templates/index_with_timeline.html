@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Power Theft Detection System - AI-Based IDS</title>
+    <title>Power Theft Monitoring (Demo) - Heuristic Risk Scoring</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * {
@@ -1244,7 +1244,7 @@
 <body>
     <div class="navbar">
         <div class="navbar-left">
-            <h1><span class="lightning-icon">⚡</span> Power Theft Detection System</h1>
+            <h1><span class="lightning-icon">⚡</span> Power Theft Monitoring (Demo)</h1>
         </div>
         <div class="navbar-right">
             <div class="alert-bell" onclick="toggleAlertPanel()">
@@ -1305,8 +1305,8 @@
         <!-- Home Section -->
         <div id="home" class="section active">
             <div class="hero">
-                <h1>AI-Based Power Theft Detection System</h1>
-                <p>Advanced machine learning solution for detecting electricity theft in smart grids using consumption pattern analysis, anomaly detection, and real-time monitoring with 96.8% accuracy.</p>
+                <h1>Power Theft Monitoring (Demo)</h1>
+                <p>Heuristic risk scoring demo for abnormal consumption patterns (simulated/CSV-loaded readings).</p>
             </div>
             
             <div class="stats-grid" id="statsGrid">
@@ -1335,7 +1335,7 @@
             <div class="objectives-list">
                 <div class="objective-item">
                     <h3>🎯 Primary Objective</h3>
-                    <p>Develop an AI-based intrusion detection system to identify electricity theft patterns with high accuracy and minimal false positives.</p>
+                    <p>Demonstrate a monitoring workflow that flags abnormal consumption using heuristic risk scoring.</p>
                 </div>
                 <div class="objective-item">
                     <h3>📊 Data Analysis</h3>
@@ -1343,11 +1343,11 @@
                 </div>
                 <div class="objective-item">
                     <h3>🤖 Machine Learning</h3>
-                    <p>Implement advanced ML algorithms including Random Forest, Neural Networks, and ensemble methods.</p>
+                    <p>Show an ML-ready code structure (optional experimental modules not used in the demo runtime).</p>
                 </div>
                 <div class="objective-item">
-                    <h3>⚡ Real-time Detection</h3>
-                    <p>Provide real-time monitoring and alert system for immediate theft detection and response.</p>
+                    <h3>⚡ Monitoring Workflow</h3>
+                    <p>Provide a dashboard + API workflow with poll-based simulated monitoring and rule-based alerts.</p>
                 </div>
             </div>
         </div>
@@ -1356,12 +1356,10 @@
         <div id="methodology" class="section">
             <h2>Methodology</h2>
             <h3>Dataset</h3>
-            <p><strong>Extended SGCC Dataset (2015-2025)</strong></p>
+            <p><strong>Demo Dataset (simulated / CSV-loaded)</strong></p>
             <ul>
-                <li>42,372 customers with 11 years of consumption data</li>
-                <li>4,321 days of daily consumption readings</li>
-                <li>Real utility company data from State Grid Corporation of China</li>
-                <li>8.5% theft rate with realistic consumption patterns</li>
+                <li>Illustrative customer/meter records generated at runtime or loaded from a CSV file</li>
+                <li>Schema is intentionally simple for demonstration purposes</li>
             </ul>
 
             <h3>Machine Learning Pipeline</h3>
@@ -1385,7 +1383,7 @@
         <!-- Detection Results -->
         <div id="results" class="section">
             <h2>Detection Results</h2>
-            <p>Real-time theft detection results based on consumption pattern analysis for the selected year:</p>
+            <p>Demo results based on heuristic risk scoring for the selected year:</p>
             
             <div class="results-table">
                 <table>
@@ -1400,7 +1398,7 @@
                             <th>Power Factor</th>
                             <th>Unit Consumed (kWh)</th>
                             <th>Expected (kWh)</th>
-                            <th>Theft Probability</th>
+                            <th>Risk Score (Demo)</th>
                             <th>Risk Level</th>
                             <th>Status</th>
                             <th>Action</th>
@@ -1440,7 +1438,7 @@
                 </div>
                 <div class="legend-item">
                     <div class="legend-color legend-theft"></div>
-                    <span>Detected Theft/Anomaly</span>
+                    <span>Flagged Anomaly (Demo)</span>
                 </div>
                 <div class="legend-item">
                     <div class="legend-color legend-threshold"></div>
@@ -1451,7 +1449,7 @@
 
         <!-- How It Works -->
         <div id="how-it-works" class="section">
-            <h2>⚡ How Theft Detection Works - Live Demo</h2>
+            <h2>⚡ How Risk Scoring Works (Demo)</h2>
             
             <!-- Interactive Visualization -->
             <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px; border-radius: 20px; margin: 30px 0; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
@@ -1558,10 +1556,10 @@
                         </div>
                     </div>
                     
-                    <!-- AI Detection System -->
+                    <!-- Risk Scoring (Demo) -->
                     <div style="position: absolute; left: 50%; transform: translateX(-50%); bottom: 40px; text-align: center;">
                         <div id="aiSystem" style="background: linear-gradient(135deg, #667eea, #764ba2); padding: 20px 40px; border-radius: 15px; box-shadow: 0 5px 15px rgba(102,126,234,0.5); transition: all 0.3s;">
-                            <div style="color: white; font-size: 1.5em; margin-bottom: 10px;">🤖 AI Detection System</div>
+                            <div style="color: white; font-size: 1.5em; margin-bottom: 10px;">📊 Risk Scoring (Demo)</div>
                             <div id="detectionStatus" style="color: white; font-weight: 600; font-size: 1.2em;">Monitoring...</div>
                             <div id="theftProbability" style="color: white; font-size: 1.5em; margin-top: 10px; font-weight: 700;">0%</div>
                         </div>
@@ -1569,7 +1567,7 @@
                     
                 </div>
                 
-                <!-- Real-time Metrics -->
+                <!-- Live Metrics (Simulated) -->
                 <div style="background: white; padding: 20px; border-radius: 15px; margin-top: 20px;">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
                         <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 10px;">
@@ -1595,19 +1593,17 @@
             <!-- Detection Process Explanation -->
             <h3>🔍 Detection Process</h3>
             <ol style="font-size: 1.1em; line-height: 1.8;">
-                <li><strong>Data Collection:</strong> Smart meters collect consumption data every day</li>
+                <li><strong>Data Collection:</strong> Readings are simulated or loaded from a CSV file</li>
                 <li><strong>Pattern Analysis:</strong> The system analyzes consumption patterns</li>
                 <li><strong>Anomaly Detection:</strong> System identifies unusual consumption behaviors</li>
                 <li><strong>Risk Assessment (Demo Mode):</strong> The dashboard computes a heuristic risk score using: <code>risk_score = 1 - (actual_consumption / expected_consumption)</code></li>
                 <li><strong>Alert Generation:</strong> High-risk cases (>70% risk score) are flagged for investigation</li>
             </ol>
 
-            <h3>📊 Model Performance</h3>
+            <h3>📊 Notes</h3>
             <ul style="font-size: 1.1em; line-height: 1.8;">
-                <li><strong>Accuracy:</strong> 96.8% overall detection accuracy</li>
-                <li><strong>AUC-ROC:</strong> 0.982 area under the curve</li>
-                <li><strong>Precision:</strong> 92% for theft detection</li>
-                <li><strong>Recall:</strong> 69% theft case identification</li>
+                <li>Outputs shown here are generated by heuristic rules for UI/API demonstration.</li>
+                <li>No trained model is used by the current demo runtime.</li>
             </ul>
         </div>
 
@@ -1685,14 +1681,14 @@
                                 <td id="totalCustomersTrend">-</td>
                             </tr>
                             <tr>
-                                <td>Flagged for Theft</td>
+                                <td>Flagged (Demo)</td>
                                 <td id="flaggedCustomers1">-</td>
                                 <td id="flaggedCustomers2">-</td>
                                 <td id="flaggedCustomersChange">-</td>
                                 <td id="flaggedCustomersTrend">-</td>
                             </tr>
                             <tr>
-                                <td>Theft Rate (%)</td>
+                                <td>Flag Rate (%) (Demo)</td>
                                 <td id="theftRate1">-</td>
                                 <td id="theftRate2">-</td>
                                 <td id="theftRateChange">-</td>
@@ -1729,7 +1725,7 @@
             <h3>Enhancements</h3>
             <ul>
                 <li><strong>Deep Learning:</strong> Implement CNN-LSTM for temporal pattern recognition</li>
-                <li><strong>Real-time Processing:</strong> Stream processing for instant detection</li>
+                <li><strong>Streaming Ingestion (optional):</strong> Replace simulated polling with an event/stream pipeline</li>
                 <li><strong>IoT Integration:</strong> Smart meter network integration</li>
                 <li><strong>Mobile App:</strong> Field officer mobile application</li>
                 <li><strong>Blockchain:</strong> Secure and transparent audit trail</li>
@@ -1738,7 +1734,7 @@
             <h3>Scalability</h3>
             <ul>
                 <li>Cloud deployment for handling millions of customers</li>
-                <li>Distributed computing for real-time processing</li>
+                <li>Distributed processing for higher-throughput monitoring</li>
                 <li>API integration with existing utility systems</li>
                 <li>Multi-region deployment capabilities</li>
             </ul>
@@ -2387,8 +2383,8 @@
                 {
                     id: 1,
                     priority: 'critical',
-                    title: 'Critical Theft Detected',
-                    message: 'Customer MTR-2025-00001 shows 95% theft probability in Zone 11',
+                    title: 'Critical Risk Flag (Demo)',
+                    message: 'Meter MTR-2025-00001 flagged as HIGH risk in Zone 11 (heuristic demo)',
                     time: '2 minutes ago',
                     status: 'new',
                     meterId: 'MTR-2025-00001'
@@ -2671,7 +2667,7 @@
             setTimeout(() => {
                 const isHowItWorksTab = document.querySelector('.tab-button.active')?.textContent.includes('How It Works');
                 if (isHowItWorksTab) {
-                    showNotification('🚨 Theft detected! System triggered alarm', 'error');
+                    showNotification('🚨 High risk flagged (demo). Alarm triggered', 'error');
                 }
             }, 1500);
         }
@@ -2704,7 +2700,7 @@
             const actualCurrent = (EXPECTED_CURRENT * currentPercent / 100).toFixed(2);
             const drop = (100 - currentPercent).toFixed(0);
             
-            // Calculate theft probability using the same formula as backend
+            // Calculate heuristic risk score using the same formula as backend
             const ratio = actualCurrent / EXPECTED_CURRENT;
             let theftProb = 1 - ratio;
             
@@ -2721,15 +2717,15 @@
             if (theftProb > 0.7) {
                 riskLevel = 'HIGH';
                 riskColor = '#f44336';
-                statusText = '🚨 THEFT DETECTED!';
+                statusText = '🚨 High Risk Flag (Demo)';
             } else if (theftProb >= 0.4) {
                 riskLevel = 'MEDIUM';
                 riskColor = '#FF9800';
-                statusText = '⚠️ Suspicious Activity';
+                statusText = '⚠️ Elevated Risk (Demo)';
             } else {
                 riskLevel = 'LOW';
                 riskColor = '#4CAF50';
-                statusText = '✅ Normal Operation';
+                statusText = '✅ Normal Range (Demo)';
             }
             
             // Update UI elements
@@ -2809,16 +2805,16 @@
                     // 🚨 TRIGGER CONTINUOUS ALARM FOR HIGH RISK THEFT DETECTION
                     alarmSoundInterval = playContinuousAlarm();
                     if (isHowItWorksTab) {
-                        showNotification('🚨 HIGH RISK THEFT DETECTED!', 'error');
+                        showNotification('🚨 HIGH RISK FLAG (DEMO)!', 'error');
                     }
-                    console.log('🚨 HIGH RISK THEFT DETECTED - CONTINUOUS ALARM TRIGGERED!');
+                    console.log('🚨 HIGH RISK FLAG (DEMO) - CONTINUOUS ALARM TRIGGERED!');
                 } else if (currentRiskLevel === 'MEDIUM') {
                     // 🔔 TRIGGER SINGLE ALARM FOR MEDIUM RISK THEFT DETECTION  
                     playAlarmSound();
                     if (isHowItWorksTab) {
-                        showNotification('⚠️ MEDIUM RISK THEFT DETECTED!', 'warning');
+                        showNotification('⚠️ MEDIUM RISK FLAG (DEMO)!', 'warning');
                     }
-                    console.log('⚠️ MEDIUM RISK THEFT DETECTED - ALARM TRIGGERED!');
+                    console.log('⚠️ MEDIUM RISK FLAG (DEMO) - ALARM TRIGGERED!');
                 } else if (currentRiskLevel === 'NORMAL' && previousRiskLevel !== 'NORMAL') {
                     // Show normal operation restored message
                     if (isHowItWorksTab) {
