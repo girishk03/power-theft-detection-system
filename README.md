@@ -1,7 +1,6 @@
 # Power Theft Detection in Smart Grids (Heuristic Demo, ML-Ready Architecture)
 
 ![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
-![TensorFlow](https://img.shields.io/badge/TensorFlow-2.13-orange.svg)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 
 ## 📋 Project Overview
@@ -34,37 +33,16 @@ The repository also contains ML/feature-engineering modules intended as a founda
 
 - **Near real-time (simulated) Monitoring**: Monitoring workflow demonstrated via dashboard + API
 - **Heuristic Risk Scoring (Demo Mode)**: Produces risk-like outputs for UI/API demonstration
-- **Multiple AI Models**: CNN-LSTM, LSTM, Neural Networks, and traditional ML models
-- **Advanced Feature Engineering**: Time-domain and frequency-domain feature extraction
-- **Anomaly Detection**: Statistical and ML-based anomaly detection
-- **Class Imbalance Handling**: SMOTE implementation for balanced training
+- **Dataset Support (Optional)**: Can load a CSV dataset if provided; otherwise simulates data
 - **Interactive Dashboard**: Web-based monitoring interface
 - **Automated Alerts**: Risk-based alert system (HIGH/MEDIUM/LOW)
-- **Comprehensive Visualization**: Training metrics, ROC curves, confusion matrices
+- **CI + Tests**: Ruff + pytest run on every push via GitHub Actions
 
 ## 🏗️ System Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                    Smart Meter Data                         │
-└──────────────────────┬──────────────────────────────────────┘
-                       │
-                       ▼
-┌─────────────────────────────────────────────────────────────┐
-│              Data Preprocessing Module                      │
-│  • Missing Value Handling (Interpolation)                   │
-│  • Feature Engineering (Time & Statistical Features)        │
-│  • SMOTE for Class Imbalance                                │
-│  • Normalization & Scaling                                  │
-└──────────────────────┬──────────────────────────────────────┘
-                       │
-                       ▼
-┌─────────────────────────────────────────────────────────────┐
-│              Deep Learning Models                           │
-│  • CNN-LSTM Hybrid Model                                    │
-│  • LSTM Model                                               │
-│  • Deep Neural Network                                      │
-│  • Traditional ML (RF, SVM, GB, DT)                         │
 └──────────────────────┬──────────────────────────────────────┘
                        │
                        ▼
@@ -112,7 +90,7 @@ To convert this demo into a real ML inference system, you would typically add:
 ## 📱 Web Dashboard Features
 
 - **Near real-time (simulated) Monitoring**: Live system status and metrics (simulated feed)
-- **Detection Statistics**: Total detections, theft rate, accuracy
+- **Detection Statistics**: Total detections and risk distribution (demo)
 - **Alert Management**: View and acknowledge alerts
 - **Risk Distribution**: Visualization of risk levels
 - **Simulation Mode**: Test the system with random data
@@ -161,16 +139,22 @@ power-theft-detection-system/
 │   ├── data_preprocessing.py    # Data preprocessing and feature engineering
 │   ├── models.py                # Deep learning and ML models
 │   ├── intrusion_detection.py  # IDS implementation
+│   ├── risk_scoring.py          # Heuristic risk score helper used by the demo runtime
 │   └── visualization.py         # Plotting and visualization
 ├── templates/
 │   ├── index_with_timeline.html # Web dashboard template
 │   └── login.html              # Login page
 ├── data/
-│   └── sample_data.csv         # Small illustrative sample
+│   ├── raw/                     # (Optional) place larger datasets here
+│   └── sample_data.csv          # Small illustrative sample
 ├── results/
-│   ├── MODEL_PERFORMANCE_SUMMARY.md
-│   └── training_results.json
+│   ├── MODEL_PERFORMANCE_SUMMARY.md  # Offline/experimental notes
+│   └── training_results.json         # Offline/experimental notes
+├── tests/
+│   ├── test_api.py
+│   └── test_risk_scoring.py
 ├── app.py                      # Flask web application
+├── .github/workflows/ci.yml     # CI (ruff + pytest)
 ├── Dockerfile
 ├── requirements.txt            # Runtime/demo dependencies
 ├── requirements-ml.txt         # Optional ML/visualization dependencies
@@ -194,15 +178,9 @@ Configuration is done via environment variables (see Quick Start).
 
 ## 📊 Results & Visualization
 
-The system generates comprehensive visualizations:
+The running demo focuses on the dashboard experience and simulated monitoring.
 
-1. **Training History**: Loss and accuracy curves
-2. **ROC Curves**: Model performance comparison
-3. **Confusion Matrices**: Classification results
-4. **Precision-Recall Curves**: Trade-off analysis
-5. **Feature Importance**: Most influential features
-6. **Alert Timeline**: Temporal distribution of alerts
-7. **Consumption Patterns**: Normal vs. theft patterns
+The `results/` artifacts and the visualization modules under `src/` are intended for offline experimentation.
 
 ## 🎓 Research References
 
@@ -226,6 +204,13 @@ If `API_KEY` is not set, API routes remain accessible after login.
 ```bash
 pytest -q
 ```
+
+## CI
+
+GitHub Actions runs on every push:
+
+- `ruff check .`
+- `pytest -q`
 
 Based on literature survey including:
 
