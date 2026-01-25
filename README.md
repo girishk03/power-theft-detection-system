@@ -122,6 +122,8 @@ Response:
 ### `GET /api/year-detections/<year>`
 Returns demo detection rows with a heuristic `risk_score`.
 
+Invalid or missing readings are scored conservatively (demo) to simulate noisy field data rather than being rejected with `400`.
+
 Response (array):
 
 ```json
