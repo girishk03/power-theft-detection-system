@@ -42,7 +42,14 @@ def test_risk_score_bounds(client):
 
     for row in res.json:
         assert "risk_score" in row
+        assert "risk_level" in row
+        assert "meter_id" in row
         assert 0 <= row["risk_score"] <= 1
+
+
+def test_non_numeric_year_returns_404(client):
+    res = client.get("/api/year-detections/not-a-year", headers={"X-API-KEY": "test-key"})
+    assert res.status_code == 404
 
 
 def test_invalid_year_returns_400(client):

@@ -131,6 +131,17 @@ Response (array):
 ]
 ```
 
+## API Key Protection
+
+If `API_KEY` environment variable is set:
+
+- All `/api/*` endpoints require header `X-API-KEY: <your key>`.
+- Missing or wrong key returns `401`.
+
+If `API_KEY` is not set:
+
+- API routes are accessible after user login (demo mode).
+
 ## 📁 Project Structure
 
 ```
@@ -191,6 +202,20 @@ docker build -t power-theft .
 docker run -p 5000:5000 power-theft
 ```
 
+## Production Run (Gunicorn)
+
+For a more production-like server, run with Gunicorn:
+
+```bash
+gunicorn -w 4 -b 0.0.0.0:5000 app:app
+```
+
+Platform Procfile example:
+
+```procfile
+web: gunicorn -w 4 -b 0.0.0.0:$PORT app:app
+```
+
 ## Security Note
 
 This is a prototype. If `API_KEY` is set in the environment, `/api/*` routes require:
@@ -198,6 +223,18 @@ This is a prototype. If `API_KEY` is set in the environment, `/api/*` routes req
 - Header: `X-API-KEY: <your key>`
 
 If `API_KEY` is not set, API routes remain accessible after login.
+
+## Sample Dataset
+
+This repo includes `data/sample_data.csv` as an illustrative example.
+
+When using your own dataset, place it under `data/raw/` and set `DATASET_PATH` to point at it.
+
+Typical columns you may want (example schema; your dataset can differ):
+
+- `meter_id`
+- `timestamp`
+- `consumption`
 
 ## Testing
 
