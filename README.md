@@ -41,14 +41,14 @@ The repository also contains ML/feature-engineering modules intended as a founda
 - **Heuristic Risk Scoring (Demo Mode)**: Produces risk-like outputs for UI/API demonstration
 - **Dataset Support (Optional)**: Can load a CSV dataset if provided; otherwise simulates data
 - **Interactive Dashboard**: Web-based monitoring interface
-- **Automated Alerts**: Risk-based alert system (HIGH/MEDIUM/LOW)
-- **CI + Tests**: Ruff + pytest run on every push via GitHub Actions
+- **Rule-based alerts (demo)**: Threshold-based alert generation (HIGH/MEDIUM/LOW)
+- **CI + basic tests**: Ruff + pytest run on every push via GitHub Actions
 
 ## 🏗️ System Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    Smart Meter Data                         │
+│ Smart Meter Data (simulated / CSV-loaded readings - demo)    │
 └──────────────────────┬──────────────────────────────────────┘
                        │
                        ▼
@@ -149,6 +149,7 @@ If `API_KEY` environment variable is set:
 If `API_KEY` is not set:
 
 - API routes are accessible after user login (demo mode).
+- Login is a simple session-based demo login (no role management, no IAM).
 
 ## 📁 Project Structure
 
@@ -202,6 +203,8 @@ The running demo focuses on the dashboard experience and simulated monitoring.
 The `results/` artifacts and the visualization modules under `src/` are intended for offline experimentation.
 
 ## 🎓 Research References
+
+These works informed feature ideas and system design; they are not directly implemented in the demo runtime.
 
 ## Deployment (Docker)
 
