@@ -7,14 +7,20 @@
 
 This project is a **credible engineering demo** for power-theft monitoring in smart grids.
 
-By default, the running dashboard/API operates in **simulated demo mode** and computes **heuristic risk scores** to demonstrate monitoring workflows in **near real-time (simulated)**.
+By default, the running dashboard/API operates in **simulated demo mode** and computes **heuristic risk scores** to demonstrate a **request-driven (poll-based) monitoring** workflow.
 
 The repository also contains ML/feature-engineering modules intended as a foundation for a future “real inference” pipeline, but **real-time ML inference is not wired into the running API by default**.
 
 ## Scope
 - Heuristic anomaly risk scoring + simulated monitoring in the dashboard
-- ML-ready architecture (models + preprocessing modules are present, but not connected to live inference)
+- ML-ready architecture (offline modules are present, but not connected to live inference)
 - Research / prototype-level system
+
+"ML-ready" in the sense that:
+
+- feature extraction modules exist under `src/`
+- training/experiments are decoupled from API runtime
+- inference hooks can be added later without changing the API surface
 
 ## Non-Goals
 - Hardware / meter firmware integration
@@ -26,12 +32,12 @@ The repository also contains ML/feature-engineering modules intended as a founda
 - **Demonstrate an intrusion-detection workflow** for smart-meter consumption monitoring
 - **Handle data-related challenges** effectively (missing values, class imbalance)
 - **Provide a clear upgrade path** to real ML inference
-- **Provide near real-time (simulated) monitoring** and automated alert generation
+- **Provide poll-based simulated monitoring** and automated alert generation
 - **Support energy security** and grid sustainability
 
 ### ⚡ Key Features
 
-- **Near real-time (simulated) Monitoring**: Monitoring workflow demonstrated via dashboard + API
+- **Poll-based simulated monitoring**: Monitoring workflow demonstrated via dashboard + API
 - **Heuristic Risk Scoring (Demo Mode)**: Produces risk-like outputs for UI/API demonstration
 - **Dataset Support (Optional)**: Can load a CSV dataset if provided; otherwise simulates data
 - **Interactive Dashboard**: Web-based monitoring interface
@@ -47,7 +53,7 @@ The repository also contains ML/feature-engineering modules intended as a founda
                        │
                        ▼
 ┌─────────────────────────────────────────────────────────────┐
-│         Intrusion Detection System (IDS)                    │
+│     Anomaly-based Monitoring / Risk Scoring ("IDS")        │
 │  • Heuristic risk scoring (demo mode)                       │
 │  • Risk Classification (HIGH/MEDIUM/LOW)                    │
 │  • Anomaly Detection                                        │
@@ -57,13 +63,15 @@ The repository also contains ML/feature-engineering modules intended as a founda
                        ▼
 ┌─────────────────────────────────────────────────────────────┐
 │              Web Dashboard & Monitoring                     │
-│  • Near real-time (simulated) Metrics                       │
+│  • Poll-based simulated metrics                             │
 │  • Alert Management                                         │
 │  • Visualization & Reports                                  │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ## 🚨 Intrusion Detection System
+
+The term "IDS" is used here in a conceptual sense (monitoring abnormal consumption patterns), not as a traditional network IDS.
 
 ### Detection Process
 1. **Data Collection**: Receive consumption reading
@@ -82,14 +90,14 @@ To convert this demo into a real ML inference system, you would typically add:
 - API endpoints that load artifacts at startup and run real predictions on validated inputs
 
 ### Risk Levels
-- **HIGH**: Probability ≥ 80% - Immediate investigation required
-- **MEDIUM**: Probability ≥ 50% - Investigation recommended
-- **LOW**: Probability ≥ 30% - Monitor closely
-- **NORMAL**: Probability < 30% - No action needed
+- **HIGH**: Risk score ≥ 0.80 (heuristic, non-probabilistic)
+- **MEDIUM**: Risk score ≥ 0.50 (heuristic, non-probabilistic)
+- **LOW**: Risk score ≥ 0.30 (heuristic, non-probabilistic)
+- **NORMAL**: Risk score < 0.30 (heuristic, non-probabilistic)
 
 ## 📱 Web Dashboard Features
 
-- **Near real-time (simulated) Monitoring**: Live system status and metrics (simulated feed)
+- **Poll-based simulated monitoring**: Live system status and metrics (simulated feed)
 - **Detection Statistics**: Total detections and risk distribution (demo)
 - **Alert Management**: View and acknowledge alerts
 - **Risk Distribution**: Visualization of risk levels
@@ -148,7 +156,7 @@ If `API_KEY` is not set:
 power-theft-detection-system/
 ├── src/
 │   ├── data_preprocessing.py    # Data preprocessing and feature engineering
-│   ├── models.py                # Deep learning and ML models
+│   ├── models.py                # Experimental ML model prototypes (not used by demo runtime)
 │   ├── intrusion_detection.py  # IDS implementation
 │   ├── risk_scoring.py          # Heuristic risk score helper used by the demo runtime
 │   └── visualization.py         # Plotting and visualization
@@ -235,6 +243,12 @@ Typical columns you may want (example schema; your dataset can differ):
 - `meter_id`
 - `timestamp`
 - `consumption`
+
+## Limitations
+
+- No labeled theft dataset is included in this demo.
+- The heuristic risk score is not a calibrated probability.
+- Dashboard metrics are illustrative and meant for UI/workflow demonstration.
 
 ## Testing
 
