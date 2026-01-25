@@ -17,6 +17,9 @@ def compute_risk_score(actual_consumption, expected_consumption, *, min_score=0.
     if not math.isfinite(actual):
         return float(default_score)
 
+    if actual < 0:
+        return float(default_score)
+
     score = 1 - (actual / expected)
     if score < min_score:
         return float(min_score)

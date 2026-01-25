@@ -24,3 +24,23 @@ def test_compute_risk_score_default_on_invalid_expected():
 def test_compute_risk_score_default_on_bad_inputs():
     score = compute_risk_score("x", "y")
     assert score == 0.8
+
+
+def test_compute_risk_score_default_on_negative_actual():
+    score = compute_risk_score(-5, 10)
+    assert score == 0.8
+
+
+def test_compute_risk_score_default_on_non_finite_actual():
+    score = compute_risk_score(float("inf"), 10)
+    assert score == 0.8
+
+
+def test_compute_risk_score_default_on_non_finite_expected():
+    score = compute_risk_score(10, float("nan"))
+    assert score == 0.8
+
+
+def test_compute_risk_score_clamps_low_when_expected_is_tiny():
+    score = compute_risk_score(10, 1e-9)
+    assert score == 0.3
