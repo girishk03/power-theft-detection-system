@@ -193,7 +193,7 @@ class Visualizer:
             data = alerts_df[alerts_df['risk_level'] == risk_level]
             fig.add_trace(go.Scatter(
                 x=data['timestamp'],
-                y=data['theft_probability'],
+                y=data['risk_score'],
                 mode='markers',
                 name=risk_level,
                 marker=dict(
@@ -206,7 +206,7 @@ class Visualizer:
         fig.update_layout(
             title='Alert Timeline by Risk Level',
             xaxis_title='Time',
-            yaxis_title='Theft Probability',
+            yaxis_title='Risk Score',
             hovermode='closest',
             template='plotly_white'
         )

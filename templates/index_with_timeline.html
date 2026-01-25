@@ -1596,10 +1596,10 @@
             <h3>🔍 Detection Process</h3>
             <ol style="font-size: 1.1em; line-height: 1.8;">
                 <li><strong>Data Collection:</strong> Smart meters collect consumption data every day</li>
-                <li><strong>Pattern Analysis:</strong> AI algorithms analyze consumption patterns</li>
+                <li><strong>Pattern Analysis:</strong> The system analyzes consumption patterns</li>
                 <li><strong>Anomaly Detection:</strong> System identifies unusual consumption behaviors</li>
-                <li><strong>Risk Assessment:</strong> Machine learning models calculate theft probability using formula: <code>theft_probability = 1 - (actual_consumption / expected_consumption)</code></li>
-                <li><strong>Alert Generation:</strong> High-risk cases (>70% probability) are flagged for investigation</li>
+                <li><strong>Risk Assessment (Demo Mode):</strong> The dashboard computes a heuristic risk score using: <code>risk_score = 1 - (actual_consumption / expected_consumption)</code></li>
+                <li><strong>Alert Generation:</strong> High-risk cases (>70% risk score) are flagged for investigation</li>
             </ol>
 
             <h3>📊 Model Performance</h3>
@@ -1937,7 +1937,7 @@
                         <td>${result.power_factor || (0.85 + Math.random() * 0.15).toFixed(2)}</td>
                         <td>${result.avg_consumption} kWh</td>
                         <td>${result.expected_consumption} kWh</td>
-                        <td><strong>${(result.theft_probability * 100).toFixed(1)}%</strong></td>
+                        <td><strong>${(result.risk_score * 100).toFixed(1)}%</strong></td>
                         <td><span class="risk-badge risk-${result.risk_level.toLowerCase()}">${result.risk_level}</span></td>
                         <td><span class="status-badge status-${result.status.toLowerCase().replace(' ', '-')}">${result.status}</span></td>
                         <td><button class="btn" style="padding: 5px 15px; font-size: 0.9em;" onclick="viewDetails('${result.meter_id}')">View</button></td>

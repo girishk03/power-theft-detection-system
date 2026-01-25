@@ -1,4 +1,4 @@
-# Power Theft Detection in Smart Grids Using AI-Based Intrusion Detection System
+# Power Theft Detection in Smart Grids (Heuristic Demo, ML-Ready Architecture)
 
 ![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
 ![TensorFlow](https://img.shields.io/badge/TensorFlow-2.13-orange.svg)
@@ -6,11 +6,15 @@
 
 ## 📋 Project Overview
 
-This project implements an **AI-based Intrusion Detection System (IDS)** for detecting power theft in smart grid networks. Using machine learning and deep learning techniques, the system analyzes smart meter consumption patterns to identify anomalies and potential electricity theft in **near real-time (simulated monitoring)**.
+This project is a **credible engineering demo** for power-theft monitoring in smart grids.
+
+By default, the running dashboard/API operates in **simulated demo mode** and computes **heuristic risk scores** to demonstrate monitoring workflows in **near real-time (simulated)**.
+
+The repository also contains ML/feature-engineering modules intended as a foundation for a future “real inference” pipeline, but **real-time ML inference is not wired into the running API by default**.
 
 ## Scope
-- Theft detection via consumption anomaly patterns
-- Batch inference + near real-time simulated monitoring in the dashboard
+- Heuristic anomaly risk scoring + simulated monitoring in the dashboard
+- ML-ready architecture (models + preprocessing modules are present, but not connected to live inference)
 - Research / prototype-level system
 
 ## Non-Goals
@@ -20,15 +24,16 @@ This project implements an **AI-based Intrusion Detection System (IDS)** for det
 
 ### 🎯 Objectives
 
-- **Develop an AI-based Intrusion Detection System** using deep learning techniques
+- **Demonstrate an intrusion-detection workflow** for smart-meter consumption monitoring
 - **Handle data-related challenges** effectively (missing values, class imbalance)
-- **Enhance detection performance** through advanced feature engineering
+- **Provide a clear upgrade path** to real ML inference
 - **Provide near real-time (simulated) monitoring** and automated alert generation
 - **Support energy security** and grid sustainability
 
 ### ⚡ Key Features
 
-- **Near real-time (simulated) Theft Detection**: Monitoring workflow demonstrated via dashboard + API
+- **Near real-time (simulated) Monitoring**: Monitoring workflow demonstrated via dashboard + API
+- **Heuristic Risk Scoring (Demo Mode)**: Produces risk-like outputs for UI/API demonstration
 - **Multiple AI Models**: CNN-LSTM, LSTM, Neural Networks, and traditional ML models
 - **Advanced Feature Engineering**: Time-domain and frequency-domain feature extraction
 - **Anomaly Detection**: Statistical and ML-based anomaly detection
@@ -65,7 +70,7 @@ This project implements an **AI-based Intrusion Detection System (IDS)** for det
                        ▼
 ┌─────────────────────────────────────────────────────────────┐
 │         Intrusion Detection System (IDS)                    │
-│  • Near real-time (simulated) Theft Detection               │
+│  • Heuristic risk scoring (demo mode)                       │
 │  • Risk Classification (HIGH/MEDIUM/LOW)                    │
 │  • Anomaly Detection                                        │
 │  • Alert Generation & Management                            │
@@ -80,215 +85,23 @@ This project implements an **AI-based Intrusion Detection System (IDS)** for det
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## 🛠️ Technologies Used
-
-### Core Technologies
-- **Python 3.8+**: Primary programming language
-- **TensorFlow/Keras**: Deep learning framework
-- **PyTorch**: Alternative deep learning framework
-- **Scikit-learn**: Machine learning algorithms
-
-### Data Processing
-- **NumPy**: Numerical computations
-- **Pandas**: Data manipulation
-- **Imbalanced-learn**: SMOTE implementation
-- **SciPy**: Statistical analysis
-
-### Visualization
-- **Matplotlib**: Static visualizations
-- **Seaborn**: Statistical plots
-- **Plotly**: Interactive dashboards
-
-### Web Framework
-- **Flask**: Web application framework
-- **Flask-CORS**: Cross-origin resource sharing
-
-### Additional Libraries
-- **LightGBM**: Gradient boosting
-- **XGBoost**: Extreme gradient boosting
-
-## 📦 Installation
-
-### Prerequisites
-- Python 3.8 or higher
-- pip package manager
-- (Optional) GPU with CUDA support for faster training
-
-### Step 1: Clone the Repository
-```bash
-git clone <repository-url>
-cd power-theft-detection
-```
-
-### Step 2: Create Virtual Environment (Recommended)
-```bash
-# Using venv
-python -m venv venv
-
-# Activate on macOS/Linux
-source venv/bin/activate
-
-# Activate on Windows
-venv\Scripts\activate
-```
-
-### Step 3: Install Dependencies
-```bash
-pip install -r requirements.txt
-```
-
-## 🚀 Quick Start
-
-### 1. Train the Models
-Run the complete training pipeline:
-
-```bash
-python main.py
-```
-
-This will:
-- Generate sample smart meter data (or load your own)
-- Preprocess the data
-- Train multiple models (Neural Network, LSTM, Random Forest, etc.)
-- Evaluate model performance
-- Generate visualizations
-- Save trained models
-
-### 2. Launch the Web Dashboard
-Start the Flask web application:
-
-```bash
-python app.py
-```
-
-Access the dashboard at: **http://localhost:8105**
-
-### 3. Use the Dashboard
-1. Click **"Initialize System"** to load the trained model
-2. View near real-time (simulated) statistics and metrics
-3. Click **"Simulate Detection"** to test the system
-4. Monitor alerts and acknowledge them
-5. Export reports and detection logs
-
-## 📊 Dataset
-
-See `DATASET.md` for dataset transparency and assumptions.
-
-This repository includes:
-- `data/raw/Electricity_Theft_Data.csv` (source dataset)
-- `data/sample_data.csv` (small illustrative sample)
-
-### Sample Data Generation
-The system includes a built-in sample data generator that creates realistic smart meter consumption data:
-
-```python
-from src.data_preprocessing import generate_sample_data
-
-# Generate 10,000 samples with 10% theft rate
-df = generate_sample_data(n_samples=10000, theft_ratio=0.1)
-```
-
-### Using Your Own Data
-To use your own smart meter data, ensure it has the following structure:
-
-| Column | Description | Type |
-|--------|-------------|------|
-| `timestamp` | Date and time of reading | datetime |
-| `user_id` | Unique user identifier | int/string |
-| `consumption` | Power consumption (kWh) | float |
-| `is_theft` | Theft label (0=Normal, 1=Theft) | int |
-
-Place your CSV file in `data/raw/` and modify `main.py`:
-
-```python
-df = pd.read_csv('data/raw/your_data.csv')
-```
-
-## 🧠 Models
-
-### 1. CNN-LSTM Hybrid Model
-Combines Convolutional layers for feature extraction with LSTM for temporal pattern recognition.
-
-**Architecture:**
-- CNN layers: Feature extraction from consumption patterns
-- LSTM layers: Temporal sequence learning
-- Dense layers: Classification
-
-**Best for:** Sequential time-series data with complex patterns
-
-### 2. LSTM Model
-Specialized for sequential data analysis.
-
-**Architecture:**
-- Multiple LSTM layers with dropout
-- Batch normalization
-- Dense output layer
-
-**Best for:** Time-series consumption patterns
-
-### 3. Deep Neural Network
-Fully connected neural network for tabular data.
-
-**Architecture:**
-- Multiple hidden layers (256→128→64→32)
-- Dropout and batch normalization
-- Binary classification output
-
-**Best for:** Preprocessed feature vectors
-
-### 4. Traditional ML Models
-- **Random Forest**: Ensemble decision trees
-- **Gradient Boosting**: Boosted decision trees
-- **SVM**: Support Vector Machine
-- **Decision Tree**: Single decision tree
-
-## Model Performance
-
-Metrics below are taken from `results/training_results.json`.
-
-| Model | Accuracy | Precision | Recall | F1 | AUC |
-|------|----------|-----------|--------|----|-----|
-| Random Forest (Main) | 87% | 0.84 | 0.82 | 0.83 | 0.91 |
-| Random Forest (Minimal) | 85% | 0.82 | 0.80 | 0.81 | 0.88 |
-
-### Plots
-If you generate plots during training/evaluation, commit them under `results/plots/`:
-- `confusion_matrix.png`
-- `roc_curve.png`
-
-## 🔍 Feature Engineering
-
-### Time-Based Features
-- Hour, day, month, year
-- Day of week, weekend indicator
-- Peak hour indicator
-- Cyclical encoding (sin/cos)
-
-### Statistical Features
-- Rolling mean, std, min, max (24h, 1 week, 1 month)
-- Rate of change
-- Percentage change
-- Skewness and kurtosis
-
-### User Profile Features
-- User average consumption
-- Deviation from user baseline
-- User consumption patterns
-
-### Anomaly Features
-- Z-score based anomaly detection
-- Sudden drop detection
-- Consumption pattern irregularities
-
 ## 🚨 Intrusion Detection System
 
 ### Detection Process
 1. **Data Collection**: Receive consumption reading
 2. **Preprocessing**: Extract features
-3. **Prediction**: Run through trained model
+3. **Risk Scoring (Demo Mode)**: Compute a heuristic risk score
 4. **Risk Classification**: Classify as HIGH/MEDIUM/LOW/NORMAL
 5. **Alert Generation**: Create alerts for theft cases
 6. **Logging**: Record all detections
+
+## Upgrade Path to Real ML (Optional)
+
+To convert this demo into a real ML inference system, you would typically add:
+- A training script that saves a model artifact (e.g., `joblib` or Keras model)
+- A saved scaler/normalizer and a stable feature list
+- A deterministic preprocessing pipeline shared by training and inference
+- API endpoints that load artifacts at startup and run real predictions on validated inputs
 
 ### Risk Levels
 - **HIGH**: Probability ≥ 80% - Immediate investigation required
@@ -305,54 +118,79 @@ If you generate plots during training/evaluation, commit them under `results/plo
 - **Simulation Mode**: Test the system with random data
 - **Export Functionality**: Download alerts and detection logs
 
+## API (Demo)
+
+All API routes are under `/api/*`.
+
+If `API_KEY` is set, include:
+
+- Header: `X-API-KEY: <your key>`
+
+### `GET /api/available-years`
+Response:
+
+```json
+{ "years": [2015, 2016, 2017] }
+```
+
+### `GET /api/year-detections/<year>`
+Returns demo detection rows with a heuristic `risk_score`.
+
+Response (array):
+
+```json
+[
+  {
+    "meter_id": "MTR-2024-00001",
+    "risk_score": 0.83,
+    "risk_level": "HIGH",
+    "avg_consumption": 12.3,
+    "expected_consumption": 22.0,
+    "status": "Flagged",
+    "detection_date": "2024-05-12",
+    "year": 2024
+  }
+]
+```
+
 ## 📁 Project Structure
 
 ```
-power-theft-detection/
+power-theft-detection-system/
 ├── src/
 │   ├── data_preprocessing.py    # Data preprocessing and feature engineering
 │   ├── models.py                # Deep learning and ML models
 │   ├── intrusion_detection.py  # IDS implementation
 │   └── visualization.py         # Plotting and visualization
 ├── templates/
-│   └── index.html              # Web dashboard template
+│   ├── index_with_timeline.html # Web dashboard template
+│   └── login.html              # Login page
 ├── data/
-│   ├── raw/                    # Raw data files
-│   └── processed/              # Preprocessed data
-├── models/                     # Saved trained models
+│   └── sample_data.csv         # Small illustrative sample
 ├── results/
-│   ├── plots/                  # Visualization outputs
-│   └── reports/                # Training reports
-├── static/                     # Static files for web app
-├── config.py                   # Configuration settings
-├── main.py                     # Main training script
+│   ├── MODEL_PERFORMANCE_SUMMARY.md
+│   └── training_results.json
 ├── app.py                      # Flask web application
-├── requirements.txt            # Python dependencies
+├── Dockerfile
+├── requirements.txt            # Runtime/demo dependencies
+├── requirements-ml.txt         # Optional ML/visualization dependencies
 └── README.md                   # This file
 ```
 
+## Experimental / Offline Modules
+
+The `src/` directory contains exploratory and prototype modules (feature engineering, model architectures, visualization helpers).
+These are **not used by the current demo runtime** (`app.py`) by default.
+They exist to document an ML-ready architecture and provide a starting point for future work.
+
+## Dependencies
+
+- `requirements.txt` is the lightweight set needed to run the demo web app.
+- `requirements-ml.txt` contains optional heavy dependencies (TensorFlow, scikit-learn, plotting) for offline experiments.
+
 ## 🔧 Configuration
 
-Edit `config.py` to customize:
-
-```python
-# Model parameters
-MODEL_PARAMS = {
-    'neural_network': {
-        'hidden_layers': [256, 128, 64, 32],
-        'dropout': 0.3,
-        'learning_rate': 0.001,
-        'epochs': 100
-    }
-}
-
-# Detection thresholds
-ANOMALY_THRESHOLD = 0.7
-THEFT_PROBABILITY_THRESHOLD = 0.5
-
-# SMOTE configuration
-SMOTE_SAMPLING_STRATEGY = 0.5
-```
+Configuration is done via environment variables (see Quick Start).
 
 ## 📊 Results & Visualization
 

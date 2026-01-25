@@ -37,20 +37,20 @@ class IntrusionDetectionSystem:
             dict: Detection results with probability and risk level
         """
         # Get prediction probability
-        theft_probability = self.model.predict(consumption_data)
+        risk_score = self.model.predict(consumption_data)
         
-        if len(theft_probability.shape) > 1:
-            theft_probability = theft_probability.flatten()
+        if len(risk_score.shape) > 1:
+            risk_score = risk_score.flatten()
         
         # Determine risk level
-        risk_level = self._classify_risk(theft_probability[0])
+        risk_level = self._classify_risk(risk_score[0])
         
         # Create detection result
         result = {
             'timestamp': datetime.now().isoformat(),
-            'theft_probability': float(theft_probability[0]),
+            'risk_score': float(risk_score[0]),
             'risk_level': risk_level,
-            'is_theft': theft_probability[0] > self.threshold,
+            'is_theft': risk_score[0] > self.threshold,
             'threshold': self.threshold
         }
         
@@ -73,16 +73,16 @@ class IntrusionDetectionSystem:
         Returns:
             list: Detection results for each sample
         """
-        theft_probabilities = self.model.predict(consumption_batch).flatten()
+        risk_scores = self.model.predict(consumption_batch).flatten()
         
         results = []
-        for i, prob in enumerate(theft_probabilities):
+        for i, score in enumerate(risk_scores):
             result = {
                 'sample_id': i,
                 'timestamp': datetime.now().isoformat(),
-                'theft_probability': float(prob),
-                'risk_level': self._classify_risk(prob),
-                'is_theft': prob > self.threshold,
+                'risk_score': float(score),
+                'risk_level': self._classify_risk(score),
+                'is_theft': score > self.threshold,
                 'threshold': self.threshold
             }
             results.append(result)
@@ -111,7 +111,7 @@ class IntrusionDetectionSystem:
             'alert_id': len(self.alert_history) + 1,
             'timestamp': detection_result['timestamp'],
             'risk_level': detection_result['risk_level'],
-            'theft_probability': detection_result['theft_probability'],
+            'risk_score': detection_result['risk_score'],
             'message': self._create_alert_message(detection_result),
             'status': 'ACTIVE',
             'acknowledged': False
@@ -124,7 +124,7 @@ class IntrusionDetectionSystem:
         print(f"⚠️  ALERT #{alert['alert_id']} - {alert['risk_level']} RISK")
         print(f"{'='*60}")
         print(f"Time: {alert['timestamp']}")
-        print(f"Probability: {alert['theft_probability']:.2%}")
+        print(f"Score: {alert['risk_score']:.2%}")
         print(f"Message: {alert['message']}")
         print(f"{'='*60}\n")
         
@@ -132,7 +132,7 @@ class IntrusionDetectionSystem:
     
     def _create_alert_message(self, detection_result):
         """Create human-readable alert message"""
-        prob = detection_result['theft_probability']
+        prob = detection_result['risk_score']
         risk = detection_result['risk_level']
         
         if risk == 'HIGH':
@@ -167,13 +167,13 @@ class IntrusionDetectionSystem:
         
         total = len(self.detection_log)
         theft_count = sum(1 for d in self.detection_log if d['is_theft'])
-        avg_prob = np.mean([d['theft_probability'] for d in self.detection_log])
+        avg_prob = np.mean([d['risk_score'] for d in self.detection_log])
         
         return {
             'total_detections': total,
             'theft_detected': theft_count,
             'theft_rate': theft_count / total if total > 0 else 0,
-            'avg_probability': float(avg_prob),
+            'avg_risk_score': float(avg_prob),
             'risk_distribution': self._get_risk_distribution()
         }
     
