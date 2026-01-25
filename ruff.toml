@@ -1,8 +1,4 @@
-[tool.ruff]
-# Keep this conservative for a demo repo: catch real errors without forcing style wars.
-select = ["F"]
-
-# Avoid noise from generated or vendored directories.
+ # Avoid noise from generated or vendored directories.
 exclude = [
   ".git",
   ".github",
@@ -12,3 +8,7 @@ exclude = [
 ]
 
 line-length = 100
+
+[lint]
+# Keep this conservative for a demo repo: catch real errors without forcing style wars.
+select = ["F"]

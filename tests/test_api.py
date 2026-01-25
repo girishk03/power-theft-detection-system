@@ -6,7 +6,7 @@ import pytest
 @pytest.fixture()
 def client():
     os.environ.setdefault("API_KEY", "test-key")
-    from app import app  # noqa: WPS433
+    from app import app
 
     app.config.update({
         "TESTING": True,
@@ -53,7 +53,7 @@ def test_invalid_year_returns_400(client):
 
 def test_api_requires_login_session():
     os.environ.setdefault("API_KEY", "test-key")
-    from app import app  # noqa: WPS433
+    from app import app
 
     app.config.update({
         "TESTING": True,

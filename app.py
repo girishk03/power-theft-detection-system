@@ -7,11 +7,8 @@ from flask import Flask, render_template, jsonify, request, session, redirect, u
 import pandas as pd
 import numpy as np
 import os
-import json
-from datetime import datetime, timedelta
 import random
 import time
-import math
 from functools import wraps
 import logging
 import uuid
@@ -129,7 +126,7 @@ def load_extended_dataset():
     except pd.errors.EmptyDataError:
         logger.warning('Dataset file is empty or corrupted: %s', dataset_path)
         return None
-    except Exception as e:
+    except Exception:
         logger.exception('Error loading dataset')
         return None
 
@@ -434,11 +431,9 @@ def get_year_consumption(year, meter_id=None):
         if non_zero_consumption:
             threshold = np.percentile(non_zero_consumption, 25)
             mean_consumption = np.mean(non_zero_consumption)
-            std_consumption = np.std(non_zero_consumption)
         else:
             threshold = 20
             mean_consumption = 30
-            std_consumption = 10
 
         # Find anomaly period using better logic
         # Look for significant drop in consumption (more than 30% below mean)
@@ -678,8 +673,6 @@ def get_year_detections(year):
         detections = []
 
         # Generate different probabilities based on year using the formula
-        base_prob = 0.6 + (year - 2015) * 0.02  # Increases slightly each year
-
         num_detections = max(3, min(8, int(3 + (year - 2015) * 0.5)))
 
         for i in range(num_detections):
@@ -748,7 +741,7 @@ def get_year_detections(year):
         # Ensure we have a LOW risk case for demonstration
         has_low = any(result['risk_level'] == 'LOW' for result in detections)
         if not has_low and len(detections) < 8:
-            logger.info(f"Converting last case to LOW risk for demonstration")
+            logger.info("Converting last case to LOW risk for demonstration")
             # Modify the last case to be LOW risk
             if detections:
                 last_case = detections[-1]

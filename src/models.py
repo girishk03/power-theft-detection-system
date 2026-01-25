@@ -3,7 +3,6 @@ Deep Learning Models for Power Theft Detection
 Includes CNN-LSTM, LSTM, and Neural Network architectures
 """
 
-import numpy as np
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers, models, callbacks
@@ -13,7 +12,6 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.svm import SVC
 from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score, accuracy_score
 import joblib
-import os
 
 
 class CNNLSTMModel:

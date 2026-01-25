@@ -5,7 +5,7 @@ Real-time monitoring and alert generation
 
 import numpy as np
 import pandas as pd
-from datetime import datetime, timedelta
+from datetime import datetime
 from collections import deque
 import json
 
