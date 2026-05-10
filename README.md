@@ -2,6 +2,9 @@
 
 ![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Render-46E3B7?style=for-the-badge)](https://power-theft-detection-system.onrender.com)
+
+**[🔌 Live Dashboard](https://power-theft-detection-system.onrender.com)** | Login: `admin` / `password`
 
 ## 📋 Project Overview
 

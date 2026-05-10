@@ -41,7 +41,7 @@ def _add_response_headers_and_log(response):
     response.headers.setdefault('Referrer-Policy', 'no-referrer')
 
     if 'Content-Security-Policy' not in response.headers:
-        response.headers['Content-Security-Policy'] = "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'"
+        response.headers['Content-Security-Policy'] = "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net"
 
     logger.info(
         'request_id=%s method=%s path=%s status=%s duration_ms=%s',
