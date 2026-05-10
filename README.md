@@ -9,28 +9,19 @@
 **[🔌 Live Dashboard](https://power-theft-detection-system.onrender.com)** | Login: `admin` / `password`
 
 
-## Screenshots
+## 📸 Screenshots
 
-![Login interface](docs/screenshots/16-login.png)
-*Login interface*
+| Login | Dashboard |
+|---|---|
+| <img src="docs/screenshots/16-login.png" width="400"> | <img src="docs/screenshots/15-dashboard-home.png" width="400"> |
 
-![Main dashboard with KPI metrics](docs/screenshots/15-dashboard-home.png)
-*Main dashboard with KPI metrics*
+| Detection Results | Consumption Chart |
+|---|---|
+| <img src="docs/screenshots/11-detection-results.png" width="400"> | <img src="docs/screenshots/10-consumption-visualization.png" width="400"> |
 
-![Detection results with risk levels](docs/screenshots/11-detection-results.png)
-*Detection results with risk levels*
-
-![Consumption pattern visualization](docs/screenshots/10-consumption-visualization.png)
-*Consumption pattern visualization*
-
-![Multi-year theft trend 2015-2025](docs/screenshots/07-theft-trend-chart.png)
-*Multi-year theft trend 2015-2025*
-
-![Real-time alerts system](docs/screenshots/03-alerts-new.png)
-*Real-time alerts system*
-
-![Interactive power flow simulation](docs/screenshots/05-power-flow-simulation.png)
-*Interactive power flow simulation*
+| Theft Trend | Alerts |
+|---|---|
+| <img src="docs/screenshots/07-theft-trend-chart.png" width="400"> | <img src="docs/screenshots/03-alerts-new.png" width="400"> |
 
 ---
 
