@@ -23,28 +23,6 @@
 |---|---|
 | <img src="docs/screenshots/theft-trend-chart.png" width="400"> | <img src="docs/screenshots/alerts-new.png" width="400"> |
 
----|---|
-| <img src="docs/screenshots/16-login.png" width="400"> | <img src="docs/screenshots/15-dashboard-home.png" width="400"> |
-
-| Detection Results | Consumption Chart |
-|---|---|
-| <img src="docs/screenshots/11-detection-results.png" width="400"> | <img src="docs/screenshots/10-consumption-visualization.png" width="400"> |
-
-| Theft Trend 2015-2025 | Alerts System |
-|---|---|
-| <img src="docs/screenshots/07-theft-trend-chart.png" width="400"> | <img src="docs/screenshots/03-alerts-new.png" width="400"> |
-
----|---|
-| <img src="docs/screenshots/16-login.png" width="400"> | <img src="docs/screenshots/15-dashboard-home.png" width="400"> |
-
-| Detection Results | Consumption Chart |
-|---|---|
-| <img src="docs/screenshots/11-detection-results.png" width="400"> | <img src="docs/screenshots/10-consumption-visualization.png" width="400"> |
-
-| Theft Trend | Alerts |
-|---|---|
-| <img src="docs/screenshots/07-theft-trend-chart.png" width="400"> | <img src="docs/screenshots/03-alerts-new.png" width="400"> |
-
 ---
 
 ## 📋 Project Overview
