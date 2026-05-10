@@ -8,6 +8,32 @@
 
 **[🔌 Live Dashboard](https://power-theft-detection-system.onrender.com)** | Login: `admin` / `password`
 
+
+## Screenshots
+
+![Login interface](docs/screenshots/16-login.png)
+*Login interface*
+
+![Main dashboard with KPI metrics](docs/screenshots/15-dashboard-home.png)
+*Main dashboard with KPI metrics*
+
+![Detection results with risk levels](docs/screenshots/11-detection-results.png)
+*Detection results with risk levels*
+
+![Consumption pattern visualization](docs/screenshots/10-consumption-visualization.png)
+*Consumption pattern visualization*
+
+![Multi-year theft trend 2015-2025](docs/screenshots/07-theft-trend-chart.png)
+*Multi-year theft trend 2015-2025*
+
+![Real-time alerts system](docs/screenshots/03-alerts-new.png)
+*Real-time alerts system*
+
+![Interactive power flow simulation](docs/screenshots/05-power-flow-simulation.png)
+*Interactive power flow simulation*
+
+---
+
 ## 📋 Project Overview
 
 This project is a **credible engineering demo** for power-theft monitoring in smart grids.
