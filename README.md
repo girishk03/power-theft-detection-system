@@ -1,299 +1,289 @@
-# Power Theft Detection in Smart Grids (Heuristic Demo, ML-Ready Architecture)
-![CI](https://github.com/girishk03/power-theft-detection-system/actions/workflows/ci.yml/badge.svg)
+# Power Theft Investigation Prioritization Dashboard
 
-![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
-![License](https://img.shields.io/badge/License-MIT-green.svg)
+[![CI](https://github.com/girishk03/power-theft-detection-system/actions/workflows/ci.yml/badge.svg)](https://github.com/girishk03/power-theft-detection-system/actions/workflows/ci.yml)
+[![Python](https://img.shields.io/badge/Python-3.11-blue.svg)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-Render-46E3B7?style=for-the-badge)](https://power-theft-detection-system.onrender.com)
 
-**[🔌 Live Dashboard](https://power-theft-detection-system.onrender.com)** | Login: `admin` / `password`
+A Flask dashboard and API that demonstrate **heuristic risk scoring for electricity-theft investigation prioritization**. The running application is a research/demo workflow—not a trained theft-classification model, calibrated probability service, streaming meter platform, or production utility system.
 
+## Project Overview
 
-## 📸 Screenshots
+The project helps a reviewer explore consumption patterns, rank suspicious readings, and manage illustrative alerts. It provides:
+
+- a browser dashboard with year selection, trend views, consumption charts, and detection tables;
+- deterministic API responses for a poll-based simulated monitoring workflow;
+- optional CSV-backed analysis for compatible daily-consumption data; and
+- experimental preprocessing, model, IDS, and visualization modules that are not connected to runtime inference.
+
+Runtime defaults to `DATA_MODE=simulated`. When `DATA_MODE=real`, the loader reads at most the first **1,000 rows** from `DATASET_PATH` to keep the demo responsive.
+
+## Problem Statement
+
+Utilities need to decide which unusual consumption patterns deserve investigation. This demo illustrates a transparent ranking workflow where lower-than-expected consumption receives a higher review score. The score is a rule-based signal only: it does not establish theft, replace meter validation, or automate enforcement.
+
+## Scope
+
+**Included**
+
+- Simulated or CSV-backed daily consumption views
+- Heuristic risk ranking and HIGH/MEDIUM/LOW labels
+- Year statistics, detection rows, and consumption-series APIs
+- Session login and optional API-key validation
+- Browser-local alert acknowledgement and resolution
+
+**Not included**
+
+- Trained runtime ML inference
+- Verified model-performance metrics
+- Streaming meter ingestion
+- Persistent alerts or investigation cases
+- Utility IAM, audit trails, or production deployment guarantees
+
+## Live Demo
+
+[Open the dashboard](https://power-theft-detection-system.onrender.com)
+
+- Username: `admin`
+- Password: `password`
+
+These public credentials are for the demo deployment only. Production mode requires credentials and `SECRET_KEY` to be supplied through environment variables.
+
+## Screenshots
 
 | Login | Dashboard Home |
 |---|---|
-| <img src="docs/screenshots/login.png" width="400"> | <img src="docs/screenshots/dashboard-home.png" width="400"> |
+| <img src="docs/screenshots/login.png" width="400" alt="Login page"> | <img src="docs/screenshots/dashboard-home.png" width="400" alt="Dashboard home"> |
 
 | Detection Results | Consumption Chart |
 |---|---|
-| <img src="docs/screenshots/detection-results.png" width="400"> | <img src="docs/screenshots/consumption-visualization.png" width="400"> |
+| <img src="docs/screenshots/detection-results.png" width="400" alt="Detection table"> | <img src="docs/screenshots/consumption-visualization.png" width="400" alt="Consumption visualization"> |
 
-| Theft Trend 2015-2025 | Alerts System |
+| Theft Trend | Browser-local Alerts |
 |---|---|
-| <img src="docs/screenshots/theft-trend-chart.png" width="400"> | <img src="docs/screenshots/alerts-new.png" width="400"> |
+| <img src="docs/screenshots/theft-trend-chart.png" width="400" alt="Theft trend chart"> | <img src="docs/screenshots/alerts-new.png" width="400" alt="Alerts panel"> |
 
----
+Screenshots show simulated dashboard states and should not be interpreted as measured utility outcomes.
 
-## 📋 Project Overview
+## Architecture
 
-This project is a **credible engineering demo** for power-theft monitoring in smart grids.
-
-By default, the running dashboard/API operates in **simulated demo mode** and computes **heuristic risk scores** to demonstrate a **request-driven (poll-based) monitoring** workflow.
-
-The repository also contains ML/feature-engineering modules intended as a foundation for a future “real inference” pipeline, but **real-time ML inference is not wired into the running API by default**.
-
-## Scope
-- Heuristic anomaly risk scoring + simulated monitoring in the dashboard
-- ML-ready architecture (offline modules are present, but not connected to live inference)
-- Research / prototype-level system
-
-"ML-ready" in the sense that:
-
-- feature extraction modules exist under `src/`
-- training/experiments are decoupled from API runtime
-- inference hooks can be added later without changing the API surface
-
-## Non-Goals
-- Hardware / meter firmware integration
-- Utility-scale deployment guarantees
-- Full production IAM / authorization
-
-### 🎯 Objectives
-
-- **Demonstrate an intrusion-detection workflow** for smart-meter consumption monitoring
-- **Handle data-related challenges** effectively (missing values, class imbalance)
-- **Provide a clear upgrade path** to real ML inference
-- **Provide poll-based simulated monitoring** and automated alert generation
-- **Support energy security** and grid sustainability
-
-### ⚡ Key Features
-
-- **Poll-based simulated monitoring**: Monitoring workflow demonstrated via dashboard + API
-- **Heuristic Risk Scoring (Demo Mode)**: Produces risk-like outputs for UI/API demonstration
-- **Dataset Support (Optional)**: Can load a CSV dataset if provided; otherwise simulates data
-- **Interactive Dashboard**: Web-based monitoring interface
-- **Rule-based alerts (demo)**: Threshold-based alert generation (HIGH/MEDIUM/LOW)
-- **CI + basic tests**: Ruff + pytest run on every push via GitHub Actions
-
-## 🏗️ System Architecture
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│ Smart Meter Data (simulated / CSV-loaded readings - demo)    │
-└──────────────────────┬──────────────────────────────────────┘
-                       │
-                       ▼
-┌─────────────────────────────────────────────────────────────┐
-│     Anomaly-based Monitoring / Risk Scoring ("IDS")        │
-│  • Heuristic risk scoring (demo mode)                       │
-│  • Risk Classification (HIGH/MEDIUM/LOW)                    │
-│  • Anomaly Detection                                        │
-│  • Alert Generation & Management                            │
-└──────────────────────┬──────────────────────────────────────┘
-                       │
-                       ▼
-┌─────────────────────────────────────────────────────────────┐
-│              Web Dashboard & Monitoring                     │
-│  • Poll-based simulated metrics                             │
-│  • Alert Management                                         │
-│  • Visualization & Reports                                  │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    User["User"] --> Flask["Flask Dashboard and API"]
+    Flask --> Risk["Heuristic Risk Scoring Engine"]
+    Risk --> Loader["Simulated or Real Dataset Loader"]
+    Loader --> Output["Charts and API Responses"]
 ```
 
-## 🚨 Intrusion Detection System
+The browser polls Flask endpoints. In simulated mode, the server generates deterministic year-based examples. In real mode, it loads a bounded CSV sample and may still substitute simulated series when data quality is insufficient.
 
-The term "IDS" is used here in a conceptual sense (monitoring abnormal consumption patterns), not as a traditional network IDS.
+## Dataset
 
-### Detection Process
-1. **Data Collection**: Receive consumption reading
-2. **Preprocessing**: Extract features
-3. **Risk Scoring (Demo Mode)**: Compute a heuristic risk score
-4. **Risk Classification**: Classify as HIGH/MEDIUM/LOW/NORMAL
-5. **Alert Generation**: Create alerts for theft cases
-6. **Logging**: Record all detections
+The repository includes `data/raw/Electricity_Theft_Data.csv`.
 
-## Upgrade Path to Real ML (Optional)
+| Property | Verified value |
+|---|---:|
+| Customer rows | 9,957 |
+| Daily reading columns | 365 |
+| Period | January 1–December 31, 2015 |
+| Possible readings | 3,634,305 |
+| Present readings | 3,140,639 |
+| Missing readings | 493,666 |
+| Normal labels (`CHK_STATE=0`) | 8,562 |
+| Theft labels (`CHK_STATE=1`) | 1,394 |
+| Missing labels | 1 |
 
-To convert this demo into a real ML inference system, you would typically add:
-- A training script that saves a model artifact (e.g., `joblib` or Keras model)
-- A saved scaler/normalizer and a stable feature list
-- A deterministic preprocessing pipeline shared by training and inference
-- API endpoints that load artifacts at startup and run real predictions on validated inputs
+The original source URL, dataset license, collection process, and citation requirements are **unverified** in this repository. The project MIT license covers project code and does not relicense the CSV. See [`DATASET.md`](DATASET.md) before using or redistributing the data.
 
-### Risk Levels
-- **HIGH**: Risk score ≥ 0.80 (heuristic, non-probabilistic)
-- **MEDIUM**: Risk score ≥ 0.50 (heuristic, non-probabilistic)
-- **LOW**: Risk score ≥ 0.30 (heuristic, non-probabilistic)
-- **NORMAL**: Risk score < 0.30 (heuristic, non-probabilistic)
+`data/sample_data.csv` is a separate 96-row illustrative file with an evenly balanced synthetic-looking label distribution. It is not the dashboard's default runtime source.
 
-## 📱 Web Dashboard Features
+## Risk Scoring Methodology
 
-- **Poll-based simulated monitoring**: Live system status and metrics (simulated feed)
-- **Detection Statistics**: Total detections and risk distribution (demo)
-- **Alert Management**: View and acknowledge alerts
-- **Risk Distribution**: Visualization of risk levels
-- **Simulation Mode**: Test the system with random data
-- **Export Functionality**: Download alerts and detection logs
+`src/risk_scoring.py` computes:
 
-## API (Demo)
-
-All API routes are under `/api/*`.
-
-If `API_KEY` is set, include:
-
-- Header: `X-API-KEY: <your key>`
-
-### `GET /api/available-years`
-Response:
-
-```json
-{ "years": [2015, 2016, 2017] }
+```text
+raw_score = 1 - (actual_consumption / expected_consumption)
+risk_score = clamp(raw_score, 0.30, 0.95)
 ```
 
-### `GET /api/year-detections/<year>`
-Returns demo detection rows with a heuristic `risk_score`.
+Invalid readings or baselines receive a conservative fallback score of `0.80` for review.
 
-Invalid or missing readings are scored conservatively (demo) to simulate noisy field data rather than being rejected with `400`.
+Runtime classifications in `app.py` are:
 
-Response (array):
+| Level | Runtime condition | Meaning |
+|---|---|---|
+| HIGH | `risk_score > 0.70` | Highest review priority |
+| MEDIUM | `risk_score >= 0.40` | Moderate review priority |
+| LOW | `risk_score < 0.40` | Lower review priority |
 
-```json
-[
-  {
-    "meter_id": "MTR-2024-00001",
-    "risk_score": 0.83,
-    "risk_level": "HIGH",
-    "avg_consumption": 12.3,
-    "expected_consumption": 22.0,
-    "status": "Flagged",
-    "detection_date": "2024-05-12",
-    "year": 2024
-  }
-]
-```
+Because the helper clamps scores to at least `0.30`, runtime scores normally occupy `[0.30, 0.95]`. No calibrated probability, NORMAL class, validated fraud threshold, or measured false-positive rate is claimed.
 
-## API Key Protection
+## Dashboard Functionality
 
-If `API_KEY` environment variable is set:
+- Select years from 2015–2025 for simulated timeline views.
+- Load year statistics, detection examples, and daily consumption charts.
+- Compare two simulated year summaries.
+- View deterministic risk-ranked detection rows.
+- Acknowledge, resolve, or remove sample alerts in browser memory.
+- Use simulated monitoring controls driven by client-side timers.
 
-- All `/api/*` endpoints require header `X-API-KEY: <your key>`.
-- Missing or wrong key returns `401`.
+Alert changes are not persisted and reset when the page reloads. Export/download functionality is not implemented.
 
-If `API_KEY` is not set:
+## API Endpoints
 
-- API routes are accessible after user login (demo mode).
-- Login is a simple session-based demo login (no role management, no IAM).
+| Method | Endpoint | Purpose | Authentication |
+|---|---|---|---|
+| GET | `/health` | Service health response | None |
+| GET | `/api/available-years` | Available dashboard years | Login; API key too when configured |
+| GET | `/api/year-statistics/<year>` | Simulated or CSV-backed annual summary | Login; API key too when configured |
+| GET | `/api/year-consumption/<year>` | Consumption series for a selected example | Login; API key too when configured |
+| GET | `/api/year-consumption/<year>/<meter_id>` | Consumption series for a meter index | Login; API key too when configured |
+| GET | `/api/year-detections/<year>` | Heuristic risk-ranked detection rows | Login; API key too when configured |
 
-## 📁 Project Structure
+Supported dashboard years are 2015–2025. Out-of-range integer years return `400`; non-integer route values return `404`.
 
-```
-power-theft-detection-system/
-├── src/
-│   ├── data_preprocessing.py    # Data preprocessing and feature engineering
-│   ├── models.py                # Experimental ML model prototypes (not used by demo runtime)
-│   ├── intrusion_detection.py  # IDS implementation
-│   ├── risk_scoring.py          # Heuristic risk score helper used by the demo runtime
-│   └── visualization.py         # Plotting and visualization
-├── templates/
-│   ├── index_with_timeline.html # Web dashboard template
-│   └── login.html              # Login page
-├── data/
-│   ├── raw/                     # (Optional) place larger datasets here
-│   └── sample_data.csv          # Small illustrative sample
-├── results/
-│   ├── MODEL_PERFORMANCE_SUMMARY.md  # Offline/experimental notes
-│   └── training_results.json         # Offline/experimental notes
-├── tests/
-│   ├── test_api.py
-│   └── test_risk_scoring.py
-├── app.py                      # Flask web application
-├── .github/workflows/ci.yml     # CI (ruff + pytest)
-├── Dockerfile
-├── requirements.txt            # Runtime/demo dependencies
-├── requirements-ml.txt         # Optional ML/visualization dependencies
-└── README.md                   # This file
-```
+## Authentication
 
-## Experimental / Offline Modules
+The dashboard uses a simple session login. Configure:
 
-The `src/` directory contains exploratory and prototype modules (feature engineering, model architectures, visualization helpers).
-These are **not used by the current demo runtime** (`app.py`) by default.
-They exist to document an ML-ready architecture and provide a starting point for future work.
+- `SECRET_KEY`
+- `ADMIN_USERNAME`
+- `ADMIN_PASSWORD`
 
-## Dependencies
+When `API_KEY` is configured, `/api/*` routes also require `X-API-KEY`. The API key does not replace the login session in the current decorator order.
 
-- `requirements.txt` is the lightweight set needed to run the demo web app.
-- `requirements-ml.txt` contains optional heavy dependencies (TensorFlow, scikit-learn, plotting) for offline experiments.
+## Engineering Decisions
 
-## 🔧 Configuration
+| Challenge | Solution | Engineering Impact |
+|---|---|---|
+| Demonstrate utility investigation flows without a deployed model | Use a transparent, bounded heuristic score | Keeps runtime explainable and avoids presenting scores as ML probabilities |
+| Keep the public demo responsive | Default to simulated data and cap real-mode loading at 1,000 rows | Predictable startup and API latency at the cost of full-dataset analysis |
+| Handle incomplete consumption readings | Fall back to deterministic simulated series when quality checks fail | Dashboard remains usable, but mixed real/simulated output must be interpreted carefully |
+| Protect prototype endpoints | Require a login and optionally an API key | Adds basic access control without claiming production IAM |
+| Separate experiments from runtime | Keep optional ML modules under `src/` and heavy dependencies in `requirements-ml.txt` | Runtime stays lightweight; experimental modules remain explicitly non-deployed |
 
-Configuration is done via environment variables (see Quick Start).
+## Setup Guide
 
-## 📊 Results & Visualization
-
-The running demo focuses on the dashboard experience and simulated monitoring.
-
-The `results/` artifacts and the visualization modules under `src/` are intended for offline experimentation.
-
-## 🎓 Research References
-
-These works informed feature ideas and system design; they are not directly implemented in the demo runtime.
-
-## Deployment (Docker)
+### Local Development
 
 ```bash
-docker build -t power-theft .
-docker run -p 5000:5000 power-theft
+git clone https://github.com/girishk03/power-theft-detection-system.git
+cd power-theft-detection-system
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+python app.py
 ```
 
-## Production Run (Gunicorn)
+Open `http://127.0.0.1:5000` and use the demo credentials.
 
-For a more production-like server, run with Gunicorn:
+### Configuration
 
 ```bash
-gunicorn -w 4 -b 0.0.0.0:5000 app:app
+export SECRET_KEY="replace-me"
+export ADMIN_USERNAME="reviewer"
+export ADMIN_PASSWORD="replace-me"
+export API_KEY="optional-api-key"
+export DATA_MODE="simulated"
 ```
 
-Platform Procfile example:
+### Real-Data Mode
 
-```procfile
-web: gunicorn -w 4 -b 0.0.0.0:$PORT app:app
+```bash
+export DATA_MODE="real"
+export DATASET_PATH="data/raw/Electricity_Theft_Data.csv"
+python app.py
 ```
 
-## Security Note
+Real mode loads only the first 1,000 rows. The included CSV contains 2015 columns named `DD-MM-YY`; the current loader's year-column parser expects slash-delimited dates, so the included raw file is not a complete plug-and-play source for every timeline endpoint. This mismatch is a documented limitation, not silently presented as full historical coverage.
 
-This is a prototype. If `API_KEY` is set in the environment, `/api/*` routes require:
+## Docker Setup
 
-- Header: `X-API-KEY: <your key>`
+The default image runs simulated mode and excludes datasets, screenshots, tests, and development artifacts from the build context.
 
-If `API_KEY` is not set, API routes remain accessible after login.
+```bash
+docker build -t power-theft-demo .
+docker run --rm -p 5000:5000 power-theft-demo
+```
 
-## Sample Dataset
-
-This repo includes `data/sample_data.csv` as an illustrative example.
-
-When using your own dataset, place it under `data/raw/` and set `DATASET_PATH` to point at it.
-
-Typical columns you may want (example schema; your dataset can differ):
-
-- `meter_id`
-- `timestamp`
-- `consumption`
-
-## Limitations
-
-- No labeled theft dataset is included in this demo.
-- The heuristic risk score is not a calibrated probability.
-- Dashboard metrics are illustrative and meant for UI/workflow demonstration.
+For real-data mode, mount an authorized dataset at runtime and set `DATASET_PATH` accordingly.
 
 ## Testing
 
 ```bash
+pip install -r requirements.txt
 pytest -q
+```
+
+The current suite contains 15 tests covering health, API access control, year validation, response shape, risk-score bounds, clamping, and malformed inputs.
+
+Ruff is available locally:
+
+```bash
+ruff check .
 ```
 
 ## CI
 
-GitHub Actions runs on every push:
+GitHub Actions runs `pytest tests/ -v` on pushes to `main` and on pull requests. Ruff is not currently enforced by CI.
 
-- `ruff check .`
-- `pytest -q`
+## Repository Structure
 
-Based on literature survey including:
+```text
+power-theft-detection-system/
+├── app.py                         # Flask dashboard and API runtime
+├── src/
+│   ├── risk_scoring.py            # Runtime heuristic score
+│   ├── data_preprocessing.py      # Experimental preprocessing
+│   ├── intrusion_detection.py     # Experimental IDS abstractions
+│   ├── models.py                  # Experimental model definitions
+│   └── visualization.py           # Experimental plotting helpers
+├── templates/                     # Login and dashboard UI
+├── data/
+│   ├── raw/                       # Included unverified-source 2015 CSV
+│   └── sample_data.csv            # Small illustrative sample
+├── docs/screenshots/              # Dashboard screenshots
+├── results/                       # Legacy claim audit and status metadata
+├── tests/                         # API and risk-scoring tests
+├── Dockerfile
+├── Procfile
+├── DATASET.md
+└── LICENSE
+```
 
-1. **Smart grids based on deep learning** (Noor Mahmoud Ibrahim et al., 2021)
-2. **Electricity Theft Detection in Smart Grid Systems: A CNN-LSTM Based Approach** (Md. Nazmul Hasan et al., 2019)
-3. **An Ensemble Deep Convolutional Neural Network Model for Electricity Theft Detection in Smart Grids** (Hossein Mohammadi Rouzbahani et al., 2021)
-4. **An Intelligent Framework for Electricity Theft Detection in Smart Grid** (Yogesh Kulkarni et al., 2021)
+## Experimental Modules
 
+The optional modules under `src/` contain preprocessing, model definitions, IDS abstractions, and visualization helpers. They are not trained, loaded, or called by the running Flask detection endpoints. `requirements-ml.txt` installs their optional dependencies.
 
+## Limitations
+
+- The runtime is heuristic, not trained ML inference.
+- The risk score is not a probability and has no validated operating threshold.
+- Dataset source and license are unverified.
+- The included raw data covers 2015 only and contains substantial missingness.
+- Real mode loads at most 1,000 customers and does not provide full-dataset analytics.
+- Included date-column formatting does not match the current slash-based parser.
+- Simulated years, customer growth, flagged counts, and events are illustrative.
+- Alert changes are browser-local and not auditable or persistent.
+- No export feature, streaming ingestion, meter integration, or production IAM exists.
+- Default demo credentials must not be reused outside the public demo.
+
+## Future Improvements
+
+- Establish and document dataset source, license, citation, and permitted uses.
+- Normalize the included date schema and add real-mode integration tests.
+- Add reproducible feature engineering, training, and evaluation before reporting model metrics.
+- Separate real and simulated response types explicitly in API schemas.
+- Persist investigations, alert transitions, reviewer identity, and audit history.
+- Add dashboard browser tests, Docker smoke tests, and Ruff to CI.
+- Replace demo credentials with production identity integration.
+- Add streaming ingestion only after a real meter/event source is available.
+
+## Historical Results Disclaimer
+
+Earlier repository result files described model metrics and production readiness that cannot be reproduced from the committed files. They have been replaced with an explicit verification status under `results/`. No model files, scalers, training pipeline, predictions, or evaluation plots are included.
+
+## License
+
+Project code is available under the [MIT License](LICENSE). Dataset rights remain unverified and are not granted by the project license.
