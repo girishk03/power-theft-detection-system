@@ -95,6 +95,8 @@ The repository includes `data/raw/Electricity_Theft_Data.csv`.
 
 The original source URL, dataset license, collection process, and citation requirements are **unverified** in this repository. The project MIT license covers project code and does not relicense the CSV. See [`DATASET.md`](DATASET.md) before using or redistributing the data.
 
+[`docs/data_quality_report.md`](docs/data_quality_report.md) records completeness, missingness, label distribution, runtime sampling, schema compatibility, and the unresolved source/license warning.
+
 `data/sample_data.csv` is a separate 96-row illustrative file with an evenly balanced synthetic-looking label distribution. It is not the dashboard's default runtime source.
 
 ## Risk Scoring Methodology
@@ -180,6 +182,17 @@ Open `http://127.0.0.1:5000` and use the demo credentials.
 
 ### Configuration
 
+| Variable | Default | Purpose |
+|---|---|---|
+| `DATA_MODE` | `simulated` | Select simulated or CSV-backed behavior |
+| `DATASET_PATH` | `data/processed/sgcc_extended_2014_2025.csv` | CSV path used when `DATA_MODE=real` |
+| `ADMIN_USERNAME` | `admin` | Demo login username |
+| `ADMIN_PASSWORD` | `password` | Demo login password |
+| `SECRET_KEY` | `dev-insecure-secret` outside production | Flask session signing |
+| `API_KEY` | Unset | Optional additional `/api/*` header check |
+
+Production mode rejects the default credentials and requires an explicit `SECRET_KEY`.
+
 ```bash
 export SECRET_KEY="replace-me"
 export ADMIN_USERNAME="reviewer"
@@ -216,7 +229,14 @@ pip install -r requirements.txt
 pytest -q
 ```
 
-The current suite contains 15 tests covering health, API access control, year validation, response shape, risk-score bounds, clamping, and malformed inputs.
+The current suite contains 30 tests covering:
+
+- health, dashboard startup, authentication, and every documented API route;
+- invalid and out-of-range route values;
+- risk-score bounds, clamping, and malformed inputs;
+- exact 1,000-row real-mode loading;
+- missing-value and label-count summaries; and
+- risk scoring over included real-data sample rows.
 
 Ruff is available locally:
 
@@ -226,7 +246,14 @@ ruff check .
 
 ## CI
 
-GitHub Actions runs `pytest tests/ -v` on pushes to `main` and on pull requests. Ruff is not currently enforced by CI.
+GitHub Actions runs on pushes to `main` and on pull requests. It:
+
+1. installs runtime/test dependencies on Python 3.11;
+2. runs `ruff check .`;
+3. runs `pytest tests/ -v`; and
+4. builds the Dockerfile in a separate job.
+
+The Docker job validates image construction only; it does not publish or deploy an image.
 
 ## Repository Structure
 
@@ -235,6 +262,7 @@ power-theft-detection-system/
 ├── app.py                         # Flask dashboard and API runtime
 ├── src/
 │   ├── risk_scoring.py            # Runtime heuristic score
+│   ├── data_quality.py            # Deterministic completeness and label summary
 │   ├── data_preprocessing.py      # Experimental preprocessing
 │   ├── intrusion_detection.py     # Experimental IDS abstractions
 │   ├── models.py                  # Experimental model definitions
@@ -243,7 +271,9 @@ power-theft-detection-system/
 ├── data/
 │   ├── raw/                       # Included unverified-source 2015 CSV
 │   └── sample_data.csv            # Small illustrative sample
-├── docs/screenshots/              # Dashboard screenshots
+├── docs/
+│   ├── data_quality_report.md     # Verified data-quality findings
+│   └── screenshots/               # Dashboard screenshots
 ├── results/                       # Legacy claim audit and status metadata
 ├── tests/                         # API and risk-scoring tests
 ├── Dockerfile
@@ -276,7 +306,7 @@ The optional modules under `src/` contain preprocessing, model definitions, IDS 
 - Add reproducible feature engineering, training, and evaluation before reporting model metrics.
 - Separate real and simulated response types explicitly in API schemas.
 - Persist investigations, alert transitions, reviewer identity, and audit history.
-- Add dashboard browser tests, Docker smoke tests, and Ruff to CI.
+- Add dashboard browser tests and a container runtime smoke test.
 - Replace demo credentials with production identity integration.
 - Add streaming ingestion only after a real meter/event source is available.
 
